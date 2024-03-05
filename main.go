@@ -5,15 +5,16 @@ import (
 	"html"
 	"log"
 	"net/http"
-	"prattle/endpoint"
+	"prattl/src/transcribe"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	_ = godotenv.Load(".env")
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello %q", html.EscapeString(r.URL.Path))
+		fmt.Fprintf(w, "Hello %q", html.EscapeString(transcribe.Test()))
 	})
-
-	fmt.Println(endpoint.Hey())
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
