@@ -6,11 +6,13 @@ WORKDIR /app
 # Download Go modules
 COPY go.mod go.sum ./
 RUN go mod download
-ADD src/ /app/src/
 
 
 # Copy the source code. Note the slash at the end, as explained in
 # https://docs.docker.com/reference/dockerfile/#copy
+COPY /src/ /app/src/
+# COPY /transcribe/ /app/transcribe/
+# COPY /ui/ /app/ui/
 COPY *.go ./
 
 # Build

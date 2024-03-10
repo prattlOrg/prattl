@@ -11,13 +11,17 @@ import (
 const speechToTextUrl string = "https://api.openai.com/v1/audio/transcriptions"
 
 func Test() string {
-	api_key, _ := os.LookupEnv("OPENAI_API_KEY")
+	api_key, api_key_ok := os.LookupEnv("OPENAI_API_KEY")
+
+	if !api_key_ok {
+		return "OpenAI API key not found"
+	}
 
 	jsonBody := []byte(`
-        "data": {
-            "file": "@./test.mp3",
-            "model": "whisper-1"
-          }`)
+	    "data": {
+	        "file": "@./test.mp3",
+	        "model": "whisper-1"
+	      }`)
 	bodyReader := bytes.NewReader(jsonBody)
 	req, _ := http.NewRequest(http.MethodPost, speechToTextUrl, bodyReader)
 	req.Header.Set("Content-Type", "mulitpart/form-data")
