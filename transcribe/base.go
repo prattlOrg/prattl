@@ -29,7 +29,11 @@ func Test() string {
 	client := http.Client{
 		Timeout: 30 * time.Second,
 	}
+	res, error := client.Do(req)
 
-	res, _ := client.Do(req)
-	return fmt.Sprintf("%d", res.Request.Body)
+	if error != nil {
+		return fmt.Sprintf("Error making request: %s", error)
+	}
+
+	return fmt.Sprintf("%v", res.Request.Body)
 }
