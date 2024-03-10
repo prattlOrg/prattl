@@ -15,7 +15,7 @@ import (
 func CreateWindow() {
 	go func() {
 		w := app.NewWindow()
-		if err := loop(w); err != nil {
+		if err := drawLoop(w); err != nil {
 			log.Fatal(err)
 		}
 		os.Exit(0)
@@ -23,7 +23,7 @@ func CreateWindow() {
 	app.Main()
 }
 
-func loop(w *app.Window) error {
+func drawLoop(w *app.Window) error {
 	th := material.NewTheme()
 	th.Shaper = text.NewShaper(text.WithCollection(gofont.Collection()))
 	var ops op.Ops
