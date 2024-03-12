@@ -11,7 +11,9 @@ RUN go mod download
 # https://docs.docker.com/reference/dockerfile/#copy
 # COPY /src/ /app/src/
 COPY /transcribe/ /app/transcribe/
-COPY /ui/ /app/ui/
+COPY /handler/ /app/handler/
+COPY /render/ /app/render/
+COPY /public/ /app/public/
 COPY *.go ./
 
 # Build
