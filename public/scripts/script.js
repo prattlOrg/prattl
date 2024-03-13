@@ -1,18 +1,12 @@
+window.addEventListener("DOMContentLoaded", () => {
+	addElement();
+});
+
 function addElement() {
-	// create a new div element
-	const transcriptionWrapper = document.createElement("div", {
-		class: "transcription-wrapper",
-	});
-
-	// and give it some content
-	const newContent = document.createTextNode("Hello world");
-
-	// add the text node to the newly created div
-	transcriptionWrapper.appendChild(newContent);
-
-	// add the newly created element and its content into the DOM
-	const currentDiv = document.getElementById("div1");
-	document.body.insertBefore(transcriptionWrapper, currentDiv);
+	transcriptionWrapper = document.getElementById("transcription-wrapper");
+	const transcriptionText = document.createElement("marquee");
+	transcriptionText.setAttribute("id", "transcription-text");
+	const textContent = document.createTextNode("Hello world");
+	transcriptionText.appendChild(textContent);
+	transcriptionWrapper.appendChild(transcriptionText);
 }
-
-addElement();
