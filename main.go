@@ -17,7 +17,7 @@ func main() {
 		log.Fatal("Port not defined")
 	}
 
-	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public/"))))
+	http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates/"))))
 
 	http.HandleFunc("/", handler.Home)
 

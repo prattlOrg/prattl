@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"prattl/render"
+	render "prattl/templates"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
