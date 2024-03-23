@@ -15,14 +15,15 @@
 			}
 
 			html,
-			body,
-			main {
+			body {
 				height: 100%;
 				width: 100%;
+				background-color: #222222;
 			}
 
 			#transcription-wrapper {
 				height: 100%;
+				width: 100%;
 				display: flex;
 				align-items: end;
 				justify-content: center;
@@ -37,26 +38,37 @@
 	<body>
 		<div id="transcription-wrapper"></div>
 		<script>
-			window.addEventListener("DOMContentLoaded", () => {
-				addElement();
-				const transcribeText = transcribe();
-				console.log(transcribeText);
+			window.addEventListener("DOMContentLoaded", async () => {
+				const transriptionText = await transcribe();
+				renderTranscription(transriptionText);
 			});
 
-			function transcribe() {
-				return "Transcribe";
-			}
+			const transcribe = async () => {
+				const url = "http://localhost:8080/transcribe";
+				try {
+					let response = await fetch(url);
+					const transcriptionText = await response.json();
+					console.log(transcriptionText);
+					if (transcriptionText.error) {
+						return transcriptionText.error.type;
+					}
+					return transcriptionText.text;
+				} catch (error) {
+					console.log(error);
+					return error;
+				}
+			};
 
-			function addElement() {
+			const renderTranscription = (transcriptionContent) => {
 				const transcriptionWrapper = document.getElementById(
 					"transcription-wrapper"
 				);
-				const transcriptionText = document.createElement("marquee");
+				const transcriptionText = document.createElement("p");
 				transcriptionText.setAttribute("id", "transcription-text");
-				const textContent = document.createTextNode("Hello world");
+				const textContent = document.createTextNode(transcriptionContent);
 				transcriptionText.appendChild(textContent);
 				transcriptionWrapper.appendChild(transcriptionText);
-			}
+			};
 		</script>
 	</body>
 </html>

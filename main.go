@@ -20,7 +20,10 @@ func main() {
 	http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates/"))))
 
 	http.HandleFunc("/", handler.Home)
+	http.HandleFunc("/transcribe", handler.Transcribe)
 
-	fmt.Println(fmt.Sprintf("Application running on port %s", port))
+	fmt.Println("✅ Prattl running")
+	fmt.Println(fmt.Sprintf("localhost%s", port))
+
 	log.Fatal(http.ListenAndServe(port, nil))
 }
