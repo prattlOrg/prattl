@@ -11,8 +11,8 @@ import (
 
 type WhisperResponse struct {
 	// optional fields
-	WhisperError   WhisperError   `json:"error"`
-	WhisperSuccess WhisperSuccess `json:"text"`
+	WhisperError   WhisperError `json:"error"`
+	WhisperSuccess string       `json:"text"`
 }
 
 type WhisperError struct {
@@ -20,10 +20,6 @@ type WhisperError struct {
 	Type    string `json:"type"`
 	Param   string `json:"param"`
 	Code    string `json:"code"`
-}
-
-type WhisperSuccess struct {
-	Text string `json:"text"`
 }
 
 func TranscribeWhisperApi() WhisperResponse {

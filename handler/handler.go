@@ -12,11 +12,11 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func Transcribe(w http.ResponseWriter, r *http.Request) {
-	transcriptionJSON := transcribe.TranscribeWhisperApi()
+	transcription := transcribe.TranscribeWhisperApi()
 
 	// returning json
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(&transcriptionJSON)
+	err := json.NewEncoder(w).Encode(&transcription)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
