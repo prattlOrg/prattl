@@ -11,6 +11,10 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "index")
 }
 
+func Options(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, r, "options")
+}
+
 func Transcribe(w http.ResponseWriter, r *http.Request) {
 	transcription := transcribe.TranscribeWhisperApi()
 

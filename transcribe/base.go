@@ -35,6 +35,7 @@ func TranscribeWhisperApi() WhisperResponse {
 	// https://stackoverflow.com/questions/77091845/golang-uploading-big-file-to-external-api-with-multipart-how-to-avoid-io-copy
 	pr, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+
 	go func() {
 		_ = writer.WriteField("model", "whisper-1")
 		file, err := os.Open("templates/assets/test.mp3")

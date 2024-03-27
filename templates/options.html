@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, maximum-scale=1"
+		/>
+		<title>Prattl - Options</title>
+		<style>
+			* {
+				box-sizing: border-box;
+				padding: 0;
+				margin: 0;
+			}
+
+			html,
+			body {
+				height: 100%;
+				width: 100%;
+				/* background-color: #222222; */
+			}
+
+			#form-wrapper {
+				height: 100%;
+				width: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="form-wrapper">
+			<form id="transcription-options-form" class="" action="">
+				<input type="text" name="text-font" id="text-font" />
+				<input type="text" name="text-color" id="text-color" />
+				<input type="text" name="text-size" id="text-size" />
+				<button type="submit">Submit</button>
+			</form>
+		</div>
+		<script type="module">
+			import { storeTextOptions } from "/templates/localStorage.js";
+
+			window.addEventListener("DOMContentLoaded", async () => {
+				// styling
+				const transcriptionOptionsForm = document.getElementById(
+					"transcription-options-form"
+				);
+				transcriptionOptionsForm.addEventListener("submit", async (event) => {
+					event.preventDefault();
+					handleOptionsFormSubmit(event);
+				});
+			});
+
+			const handleOptionsFormSubmit = (event) => {
+				console.log(event);
+
+				const randomColor = () => {
+					const colors = [255, 255, 255];
+					const randomColor = colors.map((color) => {
+						const randomNumber = Math.floor(Math.random() * (color - 0) + 0);
+						return randomNumber;
+					});
+					return `rgb(${randomColor})`;
+				};
+
+				const newStyle = {
+					font: "sans-serif",
+					textColor: randomColor(),
+					textSize: "4rem",
+				};
+				storeTextOptions(newStyle);
+
+				window.location.href = "/";
+			};
+		</script>
+	</body>
+</html>
