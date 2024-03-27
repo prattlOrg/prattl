@@ -33,12 +33,13 @@
 	<body>
 		<div id="form-wrapper">
 			<form id="transcription-options-form" class="" action="">
-				<input type="text" name="text-font" id="text-font" />
-				<input type="text" name="text-color" id="text-color" />
-				<input type="text" name="text-size" id="text-size" />
+				<input type="text" name="textFont" id="text-font" />
+				<input type="text" name="textColor" id="text-color" />
+				<input type="text" name="textSize" id="text-size" />
 				<button type="submit">Submit</button>
 			</form>
 		</div>
+
 		<script type="module">
 			import { storeTextOptions } from "/templates/localStorage.js";
 
@@ -54,25 +55,18 @@
 			});
 
 			const handleOptionsFormSubmit = (event) => {
-				console.log(event);
-
-				const randomColor = () => {
-					const colors = [255, 255, 255];
-					const randomColor = colors.map((color) => {
-						const randomNumber = Math.floor(Math.random() * (color - 0) + 0);
-						return randomNumber;
-					});
-					return `rgb(${randomColor})`;
-				};
+				const form = new FormData(event.target);
+				const formData = Object.fromEntries(form);
+				console.log(formData);
 
 				const newStyle = {
 					font: "sans-serif",
-					textColor: randomColor(),
-					textSize: "4rem",
+					textColor: formData.textColor,
+					textSize: formData.textSize,
 				};
 				storeTextOptions(newStyle);
 
-				window.location.href = "/";
+				// window.location.href = "/";
 			};
 		</script>
 	</body>

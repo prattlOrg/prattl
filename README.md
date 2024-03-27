@@ -5,4 +5,4 @@ Live caption overlay for streaming
 # For getting the container running
 
 `docker build --tag prattl .`
-`docker run --env-file .env -p 8080:8081 -it prattl`
+`docker run --env-file .env -p 8080:8080 -it prattl`
