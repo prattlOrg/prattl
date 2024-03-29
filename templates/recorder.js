@@ -57,11 +57,14 @@ if (navigator.mediaDevices.getUserMedia) {
       const clipLabel = document.createElement("p");
       const audio = document.createElement("audio");
       const deleteButton = document.createElement("button");
+      const transcribeButton = document.createElement("button");
 
       clipContainer.classList.add("clip");
       audio.setAttribute("controls", "");
       deleteButton.textContent = "Delete";
       deleteButton.className = "delete";
+
+      transcribeButton.textContent = "Transcribe";
 
       if (clipName === null) {
         clipLabel.textContent = "My unnamed clip";
@@ -72,6 +75,7 @@ if (navigator.mediaDevices.getUserMedia) {
       clipContainer.appendChild(audio);
       clipContainer.appendChild(clipLabel);
       clipContainer.appendChild(deleteButton);
+      clipContainer.appendChild(transcribeButton);
       soundClips.appendChild(clipContainer);
 
       audio.controls = true;
@@ -83,6 +87,13 @@ if (navigator.mediaDevices.getUserMedia) {
 
       deleteButton.onclick = function (e) {
         e.target.closest(".clip").remove();
+      };
+
+      transcribeButton.onclick = function (e) {
+        const file = new File([audio.src], "file.wav", {
+          type: audio.src.type,
+        });
+        console.log(file);
       };
 
       clipLabel.onclick = function () {
