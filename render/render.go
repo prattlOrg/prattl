@@ -7,7 +7,7 @@ import (
 )
 
 func RenderTemplate(w http.ResponseWriter, r *http.Request, html string) {
-	fp := path.Join("templates/", html+".html")
+	fp := path.Join("templates/html/", html+".html")
 	tmpl, err := template.ParseFiles(fp)
 
 	if err != nil {

@@ -21,17 +21,22 @@
 				/* background-color: #222222; */
 			}
 
-			#form-wrapper {
+			.options-container {
 				height: 100%;
 				width: 100%;
 				display: flex;
+				flex-direction: column;
 				align-items: center;
 				justify-content: center;
 			}
 		</style>
 	</head>
 	<body>
-		<div id="form-wrapper">
+		<div class="options-container">
+			<p id="text-preview">
+				Proin ac ultricies lectus. Sed vehicula ornare metus iaculis dictum.
+				Donec sollicitudin erat nunc, quis eleifend lorem luctus id.
+			</p>
 			<form id="transcription-options-form" class="" action="">
 				<input type="text" name="textFont" id="text-font" />
 				<input type="text" name="textColor" id="text-color" />
@@ -41,7 +46,8 @@
 		</div>
 
 		<script type="module">
-			import { storeTextOptions } from "/templates/localStorage.js";
+			import { storeTextOptions } from "/templates/scripts/localStorage.js";
+			import { changeTextStyle } from "/templates/scripts/changeTextStyle.js";
 
 			window.addEventListener("DOMContentLoaded", async () => {
 				// styling
@@ -64,8 +70,9 @@
 					textColor: formData.textColor,
 					textSize: formData.textSize,
 				};
-				storeTextOptions(newStyle);
 
+				storeTextOptions(newStyle);
+				changeTextStyle("text-preview");
 				// window.location.href = "/";
 			};
 		</script>
