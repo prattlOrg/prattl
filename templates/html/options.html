@@ -47,9 +47,12 @@
 
 		<script type="module">
 			import { storeTextOptions } from "/templates/scripts/localStorage.js";
-			import { changeTextStyle } from "/templates/scripts/changeTextStyle.js";
+			import setDefaultStyle from "/templates/scripts/setDefaultStyle.js";
+			import changeTextStyle from "/templates/scripts/changeTextStyle.js";
 
 			window.addEventListener("DOMContentLoaded", async () => {
+				setDefaultStyle("text-preview");
+
 				// styling
 				const transcriptionOptionsForm = document.getElementById(
 					"transcription-options-form"
