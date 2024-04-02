@@ -22,7 +22,7 @@ type WhisperError struct {
 	Code    string `json:"code"`
 }
 
-func TranscribeWhisperApi() WhisperResponse {
+func TranscribeWhisperApi(form *multipart.Form) WhisperResponse {
 	fmt.Println("transcribing...")
 
 	const speechToTextUrl string = "https://api.openai.com/v1/audio/transcriptions"
@@ -44,7 +44,7 @@ func TranscribeWhisperApi() WhisperResponse {
 			return
 		}
 		defer file.Close()
-		part3, err := writer.CreateFormFile("file", "test.mp3")
+		part3, err := writer.CreateFormFile("file", "fileMade.wav")
 		if err != nil {
 			pw.CloseWithError(err)
 			return

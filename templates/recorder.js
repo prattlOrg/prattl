@@ -90,10 +90,35 @@ if (navigator.mediaDevices.getUserMedia) {
       };
 
       transcribeButton.onclick = function (e) {
-        const file = new File([audio.src], "file.wav", {
-          type: audio.src.type,
-        });
+        const file = new File(
+          [audio.src],
+          "fileMade.wav",
+          // `${clipLabel.textContent}.wav`
+          {
+            type: audio.src.type,
+          },
+        );
         console.log(file);
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("model", "whisper-1");
+        fetch("/transcribe", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json(); // Assuming the server returns JSON
+          })
+          .then((data) => {
+            console.log("File uploaded successfully:", data);
+          })
+          .catch((error) => {
+            console.error("Error uploading file:", error);
+          });
       };
 
       clipLabel.onclick = function () {
