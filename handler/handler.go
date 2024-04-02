@@ -6,12 +6,8 @@ import (
 	"html/template"
 	"io"
 	"net/http"
-<<<<<<< HEAD
-	"prattl/render"
-=======
 	"os"
-	render "prattl/templates"
->>>>>>> origin/ezra-branch
+	render "prattl/render"
 	"prattl/transcribe"
 )
 
