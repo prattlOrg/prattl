@@ -22,6 +22,7 @@ func main() {
 	http.HandleFunc("/", handler.Home)
 	http.HandleFunc("/options", handler.Options)
 	http.HandleFunc("/transcribe", handler.Transcribe)
+	http.HandleFunc("/file_test", handler.FileUpload)
 
 	fmt.Println("✅ Prattl running")
 	fmt.Println(fmt.Sprintf("localhost%s", port))
