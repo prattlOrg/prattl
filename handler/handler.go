@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"net/http"
 	"os"
@@ -12,18 +11,13 @@ import (
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	// render.RenderTemplate(w, r, "index")
-
-	tmpl := template.Must(template.ParseFiles("templates/html/index.html", "templates/html/recorder.html"))
-
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	templs := [2]string{"index", "recorder"}
+	render.RenderTemplate(w, r, templs[:])
 }
 
 func Options(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "options")
+	templs := [1]string{"options"}
+	render.RenderTemplate(w, r, templs[:])
 }
 
 // Should accept file form
@@ -67,5 +61,4 @@ func FileUpload(w http.ResponseWriter, r *http.Request) {
 	io.Copy(f, file)
 	fmt.Printf("FILENAME %s", handler.Filename)
 	//here we save our file to our path
-	return
 }
