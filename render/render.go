@@ -9,7 +9,7 @@ import (
 func RenderTemplate(w http.ResponseWriter, r *http.Request, htmlTempls []string) {
 	var fpArray []string
 	for i := 0; i < len(htmlTempls); i++ {
-		fp := path.Join("templates/html/", htmlTempls[i]+".html")
+		fp := path.Join("public/html/", htmlTempls[i]+".html")
 		fpArray = append(fpArray, fp)
 	}
 

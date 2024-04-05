@@ -12,7 +12,7 @@ RUN go mod download
 # COPY /src/ /app/src/
 COPY /handler/ /app/handler/
 COPY /render/ /app/render/
-COPY /templates/ /app/templates/
+COPY /public/ /app/public/
 COPY /transcribe/ /app/transcribe/
 COPY *.go ./
 
