@@ -65,8 +65,18 @@
 
 			const renderTranscription = (transcriptionContent) => {
 				const transcriptionText = document.getElementById("transcription-text");
-				const textContent = document.createTextNode(transcriptionContent);
-				transcriptionText.appendChild(textContent);
+
+				// typewriter
+				var i = 0;
+				var speed = 50;
+				function typeWriter() {
+					if (i < transcriptionContent.length) {
+						transcriptionText.innerText += transcriptionContent.charAt(i);
+						i++;
+						setTimeout(typeWriter, speed);
+					}
+				}
+				typeWriter();
 			};
 		</script>
 	</body>
