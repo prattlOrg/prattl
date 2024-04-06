@@ -17,14 +17,14 @@ func main() {
 		log.Fatal("Port not defined")
 	}
 
-	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public/"))))
-
-	http.HandleFunc("/", handler.Home)
-	http.HandleFunc("/transcribe", handler.Transcribe)
-	http.HandleFunc("/file_test", handler.FileUpload)
+	mux := http.NewServeMux()
+	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public/"))))
+	mux.HandleFunc("/", handler.Home)
+	mux.HandleFunc("/transcribe/", handler.Transcribe)
+	mux.HandleFunc("/file_test/", handler.FileUpload)
 
 	fmt.Println("✅ Prattl running")
 	fmt.Println(fmt.Sprintf("localhost%s", port))
-
-	log.Fatal(http.ListenAndServe(port, nil))
+	err := http.ListenAndServe(port, mux)
+	log.Fatal(err)
 }

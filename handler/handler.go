@@ -11,6 +11,11 @@ import (
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
 	templs := [2]string{"index", "recorder"}
 	render.RenderTemplate(w, r, templs[:])
 }
