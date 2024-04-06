@@ -15,11 +15,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, templs[:])
 }
 
-func Options(w http.ResponseWriter, r *http.Request) {
-	templs := [1]string{"options"}
-	render.RenderTemplate(w, r, templs[:])
-}
-
 // Should accept file form
 func Transcribe(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(200)

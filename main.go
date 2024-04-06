@@ -20,7 +20,6 @@ func main() {
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public/"))))
 
 	http.HandleFunc("/", handler.Home)
-	http.HandleFunc("/options", handler.Options)
 	http.HandleFunc("/transcribe", handler.Transcribe)
 	http.HandleFunc("/file_test", handler.FileUpload)
 
