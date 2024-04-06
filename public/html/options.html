@@ -25,34 +25,76 @@
 				height: 100%;
 				width: 100%;
 				display: flex;
+				justify-content: space-between;
 				flex-direction: column;
-				align-items: center;
+				background-color: #0f172a;
+			}
+
+			.options-bar {
+				padding: 2rem;
+				border-bottom: 2px solid #334155;
+			}
+
+			.transcription-options-form {
+				display: flex;
 				justify-content: center;
+				align-items: flex-end;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="options-container">
+			<div class="options-bar">
+				<form
+					id="transcription-options-form"
+					class="transcription-options-form"
+					action=""
+				>
+					<label>
+						Font
+						<select name="textFont" id="text-font">
+							<option value="serif">Serif</option>
+							<option value="sans-serif">Sans-Serif</option>
+							<option value="monospace">Monospace</option>
+							<option value="cursive">Cursive</option>
+							<option value="fantasy">Fantasy</option>
+						</select>
+					</label>
+					<input type="color" name="textColor" id="text-color" />
+					<input
+						type="number"
+						name="textSize"
+						id="text-size"
+						min="12"
+						max="72"
+					/>
+					<button type="submit">Submit</button>
+				</form>
+			</div>
 			<p id="text-preview">
 				Proin ac ultricies lectus. Sed vehicula ornare metus iaculis dictum.
 				Donec sollicitudin erat nunc, quis eleifend lorem luctus id.
 			</p>
-			<form id="transcription-options-form" class="" action="">
-				<input type="text" name="textFont" id="text-font" />
-				<input type="text" name="textColor" id="text-color" />
-				<input type="text" name="textSize" id="text-size" />
-				<button type="submit">Submit</button>
-			</form>
 		</div>
 		<script type="module">
-			import { storeTextOptions } from "/public/scripts/localStorage.js";
+			import {
+				storeTextOptions,
+				getTextOptions,
+			} from "/public/scripts/localStorage.js";
 			import setDefaultStyle from "/public/scripts/setDefaultStyle.js";
 			import changeTextStyle from "/public/scripts/changeTextStyle.js";
 
 			window.addEventListener("DOMContentLoaded", async () => {
 				setDefaultStyle("text-preview");
 
-				// styling
+				// setting default values
+				const textFont = document.getElementById("text-font");
+				const textColor = document.getElementById("text-color");
+				const textSize = document.getElementById("text-size");
+				textFont.value = getTextOptions().font;
+				textColor.value = getTextOptions().textColor;
+				textSize.value = getTextOptions().textSize;
+
 				const transcriptionOptionsForm = document.getElementById(
 					"transcription-options-form"
 				);
@@ -65,13 +107,13 @@
 			const handleOptionsFormSubmit = (event) => {
 				const form = new FormData(event.target);
 				const formData = Object.fromEntries(form);
-				console.log(formData);
 
 				const newStyle = {
-					font: "sans-serif",
+					font: formData.textFont,
 					textColor: formData.textColor,
 					textSize: formData.textSize,
 				};
+				console.log(newStyle);
 
 				storeTextOptions(newStyle);
 				changeTextStyle("text-preview");
