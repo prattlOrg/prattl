@@ -38,7 +38,7 @@ func TranscribeWhisperApi(form *multipart.Form) WhisperResponse {
 
 	go func() {
 		_ = writer.WriteField("model", "whisper-1")
-		file, err := os.Open("templates/assets/test.mp3")
+		file, err := os.Open("public/assets/test.mp3")
 		if err != nil {
 			pw.CloseWithError(err)
 			return
