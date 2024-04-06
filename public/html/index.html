@@ -36,28 +36,19 @@
 		</style>
 	</head>
 	<body>
-		{{template "recorder" .}}
+		<!-- {{template "recorder" .}} -->
 		<div id="transcription-wrapper">
 			<p id="transcription-text"></p>
 		</div>
-
 		<script type="module">
-			import {
-				getTextOptions,
-				storeTextOptions,
-			} from "/public/scripts/localStorage.js";
-			import setDefaultStyle from "/public/scripts/setDefaultStyle.js";
-			import changeTextStyle from "/public/scripts/changeTextStyle.js";
-
 			window.addEventListener("DOMContentLoaded", async () => {
-				// setDefaultStyle("transcription-text");
-				// // transcription
-				// const transcriptionText = await transcribe();
-				// renderTranscription(transcriptionText);
+				// transcription
+				const transcriptionText = await transcribe();
+				renderTranscription(transcriptionText);
 			});
 
 			const transcribe = async () => {
-				const url = "http://localhost:8081/transcribe";
+				const url = "http://localhost:8080/transcribe";
 				try {
 					let response = await fetch(url);
 					const transcriptionText = await response.json();
@@ -76,7 +67,6 @@
 				const transcriptionText = document.getElementById("transcription-text");
 				const textContent = document.createTextNode(transcriptionContent);
 				transcriptionText.appendChild(textContent);
-				changeTextStyle("transcription-text");
 			};
 		</script>
 	</body>
