@@ -22,9 +22,7 @@ type WhisperError struct {
 	Code    string `json:"code"`
 }
 
-func TranscribeWhisperApi(form *multipart.Form) WhisperResponse {
-	fmt.Println("transcribing...")
-
+func TranscribeWhisperApi(file multipart.File) WhisperResponse {
 	const speechToTextUrl string = "https://api.openai.com/v1/audio/transcriptions"
 	api_key, api_key_ok := os.LookupEnv("OPENAI_API_KEY")
 	if !api_key_ok {
@@ -38,12 +36,12 @@ func TranscribeWhisperApi(form *multipart.Form) WhisperResponse {
 
 	go func() {
 		_ = writer.WriteField("model", "whisper-1")
-		file, err := os.Open("public/assets/test.mp3")
-		if err != nil {
-			pw.CloseWithError(err)
-			return
-		}
-		defer file.Close()
+		// file, err := os.Open("public/assets/test.mp3")
+		// if err != nil {
+		// 	pw.CloseWithError(err)
+		// 	return
+		// }
+		// defer file.Close()
 		part3, err := writer.CreateFormFile("file", "fileMade.wav")
 		if err != nil {
 			pw.CloseWithError(err)
@@ -57,18 +55,37 @@ func TranscribeWhisperApi(form *multipart.Form) WhisperResponse {
 		pw.CloseWithError(writer.Close())
 	}()
 
+	// // open
+	// f, h, err := req.FormFile("q")
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+	// defer f.Close()
+
+	// // for your information
+	// fmt.Println("\nfile:", f, "\nheader:", h, "\nerr", err)
+
+	// // read
+	// bs, err := ioutil.ReadAll(f)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+	// s = string(bs)
+
 	request, _ := http.NewRequest("POST", speechToTextUrl, pr)
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api_key))
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 	client := &http.Client{}
-	response, error := client.Do(request)
-	if error != nil {
-		fmt.Println(error)
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	responseBody, error := io.ReadAll(response.Body)
-	if error != nil {
-		fmt.Println(error)
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err)
 	}
 	defer response.Body.Close()
 

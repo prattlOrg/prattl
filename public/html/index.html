@@ -22,47 +22,56 @@
 			}
 
 			#transcription-wrapper {
-				height: 100%;
 				width: 100%;
+				height: 100%;
 				display: flex;
-				align-items: end;
-				justify-content: center;
-				white-space: nowrap;
+				align-items: flex-end;
+				justify-content: flex-end;
 			}
 
 			#transcription-text {
+				width: 100%;
+				display: flex;
+				gap: 1rem;
+				flex-wrap: wrap;
+
+				/* truncate */
+
+				/* display: -webkit-box;
+				overflow: hidden;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 2;
+				line-clamp: 2; */
+			}
+
+			#word-chunk {
+				padding: 0 0.5rem 0 0.5rem;
+				background-color: #1e293b;
 				font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
 					Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
 					sans-serif;
 				font-size: 4rem;
 				color: greenyellow;
-				display: flex;
-				gap: 1rem;
-			}
-
-			#word-span {
-				padding: 0 0.5rem 0 0.5rem;
-				background-color: #1e293b;
 			}
 		</style>
 	</head>
 	<body>
-		<!-- {{template "recorder" .}} -->
-		<div id="transcription-wrapper">
-			<p id="transcription-text"></p>
-		</div>
+		{{template "recorder" .}}
+		<!-- <div id="transcription-wrapper">
+			<div id="transcription-text"></div>
+		</div> -->
 		<script type="module">
 			window.addEventListener("DOMContentLoaded", async () => {
 				// transcription
 				// const transcriptionText = await transcribe();
 				// renderTranscription(transcriptionText);
-				renderTranscription(
-					"Vivamus fringilla, nisi at tempor volutpat, tortor erat tempus augue, sed facilisis metus lectus a ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam sit amet mattis nunc. Sed sit amet euismod augue. Nam sed efficitur nisi, a gravida mauris. Etiam arcu urna, ultrices quis arcu et, lacinia ultricies dolor. Nullam sit amet mollis diam. Vivamus ut ligula non diam eleifend suscipit vel in sapien. Pellentesque ut diam sit amet diam molestie sodales ut a nisi. Maecenas turpis arcu, pellentesque ac mauris et, congue ultrices turpis. Sed ut elementum lorem. Vivamus interdum elit ut tortor auctor vehicula."
-				);
+				// renderTranscription(
+				// 	"Vivamus fringilla, nisi at tempor volutpat, tortor erat tempus augue, sed facilisis metus lectus a ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam sit amet mattis nunc. Sed sit amet euismod augue. Nam sed efficitur nisi, a gravida mauris. Etiam arcu urna, ultrices quis arcu et, lacinia ultricies dolor. Nullam sit amet mollis diam. Vivamus ut ligula non diam eleifend suscipit vel in sapien. Pellentesque ut diam sit amet diam molestie sodales ut a nisi. Maecenas turpis arcu, pellentesque ac mauris et, congue ultrices turpis. Sed ut elementum lorem. Vivamus interdum elit ut tortor auctor vehicula."
+				// );
 			});
 
 			const transcribe = async () => {
-				const url = "http://localhost:8080/transcribe";
+				const url = "http://localhost:8080/transcribe/";
 				try {
 					let response = await fetch(url);
 					const transcriptionText = await response.json();
@@ -70,7 +79,6 @@
 					if (transcriptionText.error) {
 						return transcriptionText.error.type;
 					}
-
 					return transcriptionText.text;
 				} catch (error) {
 					console.log(error);
@@ -81,27 +89,27 @@
 			const renderTranscription = (transcriptionContent) => {
 				const transcriptionText = document.getElementById("transcription-text");
 
-				const contentToWords = transcriptionContent.split(" ");
+				const wordChunks = transcriptionContent.split(" ");
 
 				// typewriter
-				var i = 0;
-				var delay = 500;
-				function typeWriter() {
-					if (i < contentToWords.length) {
-						const wordSpan = document.createElement("span");
-						wordSpan.id = "word-span";
-						const wordSpanContent = document.createTextNode(contentToWords[i]);
-						wordSpan.appendChild(wordSpanContent);
-						transcriptionText.appendChild(wordSpan);
+				let i = 0;
+				const delay = 500;
+				const typeWriter = () => {
+					if (i < wordChunks.length) {
+						const wordChunk = document.createElement("span");
+						wordChunk.id = "word-chunk";
+						const wordChunkContent = document.createTextNode(wordChunks[i]);
+						wordChunk.appendChild(wordChunkContent);
+						transcriptionText.appendChild(wordChunk);
 
-						// testing
+						// typewriter effect
 						// transcriptionText.innerText += transcsriptionContent.charAt(i);
-						// transcriptionText.innerHTML += contentToWords[i] + " ";
+						// transcriptionText.innerHTML += wordChunks[i] + " ";
 
 						i++;
 						setTimeout(typeWriter, delay);
 					}
-				}
+				};
 				typeWriter();
 			};
 		</script>

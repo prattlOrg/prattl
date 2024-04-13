@@ -89,21 +89,20 @@ if (navigator.mediaDevices.getUserMedia) {
 				e.target.closest(".clip").remove();
 			};
 
-			transcribeButton.onclick = function (e) {
+			transcribeButton.onclick = async function (e) {
 				const file = new File(
 					[audio.src],
-					"fileMade.wav",
-					// `${clipLabel.textContent}.wav`
+					`${clipLabel.textContent.replaceAll(" ", "_")}.mp3`,
 					{
-						type: audio.src.type,
+						type: "audio/mpeg",
 					}
 				);
 				console.log(file);
 
 				const formData = new FormData();
 				formData.append("file", file);
-				formData.append("model", "whisper-1");
-				fetch("/transcribe", {
+
+				fetch("http://localhost:8080/transcribe/", {
 					method: "POST",
 					body: formData,
 				})
