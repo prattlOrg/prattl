@@ -78,6 +78,8 @@ if (navigator.mediaDevices.getUserMedia) {
 			clipContainer.appendChild(transcribeButton);
 			soundClips.appendChild(clipContainer);
 
+			console.log(mediaRecorder.mimeType);
+
 			audio.controls = true;
 			const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
 			chunks = [];
@@ -92,9 +94,9 @@ if (navigator.mediaDevices.getUserMedia) {
 			transcribeButton.onclick = async function (e) {
 				const file = new File(
 					[audio.src],
-					`${clipLabel.textContent.replaceAll(" ", "_")}.mp3`,
+					`${clipLabel.textContent.replaceAll(" ", "_")}.webm`,
 					{
-						type: "audio/mpeg",
+						type: mediaRecorder.mimeType,
 					}
 				);
 				console.log(file);

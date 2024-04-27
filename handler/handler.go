@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	render "prattl/render"
@@ -22,23 +21,33 @@ func Home(w http.ResponseWriter, r *http.Request) {
 func Transcribe(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("transcribing...")
 
-	// getting file from multipart form
-	file, fileHeader, err := r.FormFile("file")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
+	// out, err := exec.Command("ls", "-a").Output()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println("Command Successfully Executed")
+	// 	fmt.Println(string(out))
+	// }
 
-	fmt.Println("\nfile:", file, "\nheader:", fileHeader, "\nerr", err)
+	transcribe.TranscribeLocal()
 
-	transcription := transcribe.TranscribeWhisperApi(file)
+	// // getting file from multipart form
+	// file, fileHeader, err := r.FormFile("file")
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+	// defer file.Close()
 
-	// returning json
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(&transcription)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	// fmt.Println("\nfile:", file, "\nheader:", fileHeader, "\nerr", err)
+
+	// transcription := transcribe.TranscribeWhisperApi(file)
+
+	// // returning json
+	// w.Header().Set("Content-Type", "application/json")
+	// err = json.NewEncoder(w).Encode(&transcription)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
 }

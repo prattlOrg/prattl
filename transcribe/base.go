@@ -1,12 +1,14 @@
 package transcribe
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/exec"
 )
 
 type WhisperResponse struct {
@@ -77,6 +79,7 @@ func TranscribeWhisperApi(file multipart.File) WhisperResponse {
 	request, _ := http.NewRequest("POST", speechToTextUrl, pr)
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api_key))
 	request.Header.Add("Content-Type", writer.FormDataContentType())
+	println(request)
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
@@ -92,4 +95,25 @@ func TranscribeWhisperApi(file multipart.File) WhisperResponse {
 	var whisperResponse WhisperResponse
 	json.Unmarshal(responseBody, &whisperResponse)
 	return whisperResponse
+}
+
+func TranscribeLocal() {
+	cmd := exec.Command("python3", "./transcribe/transcribe.py")
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+		return
+	}
+	fmt.Println("Result: " + out.String())
+
+	// out, err := exec.Command("python3", "./transcribe/transcribe.py").Output()
+	// if err != nil {
+	// 	fmt.Printf("Error: %s", err)
+	// } else {
+	// 	fmt.Println(string(out))
+	// }
 }
