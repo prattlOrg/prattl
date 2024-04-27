@@ -109,11 +109,4 @@ func TranscribeLocal() {
 		return
 	}
 	fmt.Println("Result: " + out.String())
-
-	// out, err := exec.Command("python3", "./transcribe/transcribe.py").Output()
-	// if err != nil {
-	// 	fmt.Printf("Error: %s", err)
-	// } else {
-	// 	fmt.Println(string(out))
-	// }
 }
