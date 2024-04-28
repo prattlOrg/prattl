@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \ 
     python3-venv 
-# Create/activate python VE for pip package management
+# Create/activate python VE to go from apt-get to pip package management to avoid:
+# error - externally-managed-environment 
 RUN python3 -m venv /opt/venv 
 ENV PATH="/opt/venv/bin:$PATH"
 # Download python packages

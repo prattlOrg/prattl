@@ -20,15 +20,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 // Should accept file form
 func Transcribe(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("transcribing...")
-
-	// out, err := exec.Command("ls", "-a").Output()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// } else {
-	// 	fmt.Println("Command Successfully Executed")
-	// 	fmt.Println(string(out))
-	// }
-
 	transcribe.TranscribeLocal()
 
 	// // getting file from multipart form
