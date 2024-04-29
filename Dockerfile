@@ -7,7 +7,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \ 
     python3 \
     python3-pip \ 
-    python3-venv 
+    python3-venv \
+    ffmpeg
 # Create/activate python VE to go from apt-get to pip package management to avoid:
 # error - externally-managed-environment 
 RUN python3 -m venv /opt/venv 

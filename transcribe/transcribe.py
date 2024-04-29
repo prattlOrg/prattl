@@ -1,26 +1,31 @@
 #!/usr/bin/env python3
 
 import torch
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
-from datasets import Audio, load_dataset
+from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 
 def main ():
-    # load model and processor
-    processor = WhisperProcessor.from_pretrained("openai/whisper-tiny")
-    model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny")
-    forced_decoder_ids = processor.get_decoder_prompt_ids(language="english", task="transcribe")
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-    # load dummy dataset and read audio files
-    ds = load_dataset("mozilla-foundation/common_voice_11_0", "en", streaming=True, trust_remote_code=True)
-    ds = ds.cast_column("audio", Audio(sampling_rate=16_000))
-    input_speech = next(iter(ds))["audio"]
-    input_features = processor(input_speech["array"], sampling_rate=input_speech["sampling_rate"], return_tensors="pt").input_features 
+    model_id = "distil-whisper/distil-large-v3"
 
-    # generate token ids
-    predicted_ids = model.generate(input_features, forced_decoder_ids=forced_decoder_ids)
-    # decode token ids to text
-    transcription = processor.batch_decode(predicted_ids)
-    
-    print(transcription)
+    model = AutoModelForSpeechSeq2Seq.from_pretrained(
+        model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
+    )
+    model.to(device)
+
+    processor = AutoProcessor.from_pretrained(model_id)
+
+    pipe = pipeline(
+        "automatic-speech-recognition",
+        model=model,
+        tokenizer=processor.tokenizer,
+        feature_extractor=processor.feature_extractor,
+        max_new_tokens=128,
+        torch_dtype=torch_dtype,
+        device=device,
+    )
+    result = pipe("transcribe/test.mp3")
+    print(result["text"])
 if __name__ == "__main__":
     main()

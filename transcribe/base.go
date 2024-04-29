@@ -98,7 +98,8 @@ func TranscribeWhisperApi(file multipart.File) WhisperResponse {
 }
 
 func TranscribeLocal() {
-	cmd := exec.Command("python3", "./transcribe/transcribe.py")
+	// cmd := exec.Command("ffmpeg")
+	cmd := exec.Command("python3", "transcribe/transcribe.py")
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
