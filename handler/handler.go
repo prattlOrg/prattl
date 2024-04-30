@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"html/template"
 	"log"
 	"net/http"
 	"prattl/render"
@@ -10,15 +9,14 @@ import (
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/index.html", "templates/recorder.html"))
-
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
 	}
 
 	templs := [2]string{"index", "recorder"}
 	render.RenderTemplate(w, r, templs[:])
+
 }
 
 var upgrader = websocket.Upgrader{}
@@ -42,6 +40,7 @@ func Transcribe(w http.ResponseWriter, r *http.Request) {
 		log.Printf("type: %v", t)
 		// send base64 encoded string to python
 		// audio_bytes = append(audio_bytes, message...)
+
 		// break
 	}
 }
