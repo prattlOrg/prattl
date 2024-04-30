@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"fmt"
+	"log"
 	"net/http"
-	render "prattl/render"
-	"prattl/transcribe"
+	"prattl/render"
+
+	"github.com/gorilla/websocket"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -15,29 +16,31 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	templs := [2]string{"index", "recorder"}
 	render.RenderTemplate(w, r, templs[:])
+
 }
 
+var upgrader = websocket.Upgrader{}
+
 func Transcribe(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("transcribing...")
-	transcribe.TranscribeLocal()
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade:", err)
+		return
+	}
+	defer c.Close()
+	for {
+		t, message, err := c.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			break
+		}
 
-	// // getting file from multipart form
-	// file, fileHeader, err := r.FormFile("file")
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// defer file.Close()
+		log.Printf("recv: %v", string(message))
+		// os.WriteFile("content.txt", message, 0666)
+		log.Printf("type: %v", t)
+		// send base64 encoded string to python
+		// audio_bytes = append(audio_bytes, message...)
 
-	// fmt.Println("\nfile:", file, "\nheader:", fileHeader, "\nerr", err)
-
-	// transcription := transcribe.TranscribeWhisperApi(file)
-
-	// // returning json
-	// w.Header().Set("Content-Type", "application/json")
-	// err = json.NewEncoder(w).Encode(&transcription)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+		// break
+	}
 }
