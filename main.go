@@ -7,8 +7,11 @@ import (
 	"os"
 	"prattl/handler"
 
+	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 )
+
+var upgrader = websocket.Upgrader{}
 
 func main() {
 	_ = godotenv.Load(".env")
