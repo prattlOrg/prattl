@@ -7,8 +7,11 @@ import (
 	"os"
 	"prattl/handler"
 
+	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 )
+
+var upgrader = websocket.Upgrader{}
 
 func main() {
 	_ = godotenv.Load(".env")
@@ -20,9 +23,7 @@ func main() {
 	http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates/"))))
 
 	http.HandleFunc("/", handler.Home)
-	http.HandleFunc("/options", handler.Options)
 	http.HandleFunc("/transcribe", handler.Transcribe)
-	http.HandleFunc("/file_test", handler.FileUpload)
 
 	fmt.Println("✅ Prattl running")
 	fmt.Println(fmt.Sprintf("localhost%s", port))
