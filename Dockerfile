@@ -23,7 +23,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /prattl
 # But we can document in the Dockerfile what ports
 # the application is going to listen on by default.
 # https://docs.docker.com/reference/dockerfile/#expose
-EXPOSE 8081
+EXPOSE 8080
 
 # Run
 CMD ["/prattl"]

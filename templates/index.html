@@ -65,7 +65,7 @@
       });
 
       const transcribe = async () => {
-        const url = "http://localhost:8081/transcribe";
+        const url = "http://localhost:8080/transcribe";
         try {
           let response = await fetch(url);
           const transcriptionText = await response.json();

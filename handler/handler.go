@@ -27,17 +27,13 @@ func Transcribe(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	for {
-		t, message, err := c.ReadMessage()
+		_, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
 
 		log.Printf("recv: %v", string(message))
-		// os.WriteFile("content.txt", message, 0666)
-		log.Printf("type: %v", t)
 		// send base64 encoded string to python
-		// audio_bytes = append(audio_bytes, message...)
-		// break
 	}
 }

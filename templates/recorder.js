@@ -34,7 +34,7 @@ if (
   let onSuccess = function (stream) {
     const options = { mimeType: "audio/webm" };
     const mediaRecorder = new MediaRecorder(stream, options);
-    var socket = new WebSocket("ws://localhost:8081/transcribe");
+    var socket = new WebSocket("ws://localhost:8080/transcribe");
 
     record.onclick = function () {
       mediaRecorder.start();
