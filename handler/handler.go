@@ -56,6 +56,5 @@ func Transcribe(w http.ResponseWriter, r *http.Request) {
 		defer un(trace("transcribe.TranscribeLocal()"))
 		fmt.Println("transcribing...")
 		transcribe.TranscribeLocal(string(message))
-		// break
 	}
 }
