@@ -1,12 +1,33 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"prattl/render"
+	"prattl/transcribe"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+//// Logging
+
+func trace(s string) (string, time.Time) {
+	fmt.Println()
+	log.Println("START:", s)
+	return s, time.Now()
+}
+
+func un(s string, startTime time.Time) {
+	endTime := time.Now()
+	log.Println("END:", s, "took", endTime.Sub(startTime))
+	fmt.Println()
+}
+
+//// Logging
+
+var upgrader = websocket.Upgrader{}
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -16,10 +37,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	templs := [2]string{"index", "recorder"}
 	render.RenderTemplate(w, r, templs[:])
-
 }
-
-var upgrader = websocket.Upgrader{}
 
 func Transcribe(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -29,18 +47,15 @@ func Transcribe(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	for {
-		t, message, err := c.ReadMessage()
+		_, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
 
-		log.Printf("recv: %v", string(message))
-		// os.WriteFile("content.txt", message, 0666)
-		log.Printf("type: %v", t)
-		// send base64 encoded string to python
-		// audio_bytes = append(audio_bytes, message...)
-
+		defer un(trace("transcribe.TranscribeLocal()"))
+		fmt.Println("transcribing...")
+		transcribe.TranscribeLocal(string(message))
 		// break
 	}
 }

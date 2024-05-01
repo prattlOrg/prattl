@@ -6,9 +6,8 @@ import (
 	"os/exec"
 )
 
-func TranscribeLocal() {
-	// cmd := exec.Command("ffmpeg")
-	cmd := exec.Command("python3", "transcribe/transcribe.py")
+func TranscribeLocal(base64 string) {
+	cmd := exec.Command("python3", "transcribe/transcribe.py", base64)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -18,5 +17,5 @@ func TranscribeLocal() {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		return
 	}
-	fmt.Println("Result: " + out.String())
+	fmt.Print("Result: " + out.String())
 }

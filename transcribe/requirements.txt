@@ -1,3 +1,4 @@
 torch
+torchaudio
 transformers
 accelerate
