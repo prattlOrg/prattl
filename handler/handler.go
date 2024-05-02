@@ -11,10 +11,9 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-func Public(w http.ResponseWriter, r *http.Request) {
-	http.StripPrefix("/public/", http.FileServer(http.Dir("public/")))
-	http.NotFound(w, r)
-}
+// func Public(w http.ResponseWriter, r *http.Request) {
+// 	// http.NotFound(w, r)
+// }
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
