@@ -18,7 +18,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public/"))))
+	mux.HandleFunc("/public/", handler.Public)
 	mux.HandleFunc("/", handler.Home)
 	mux.HandleFunc("/transcribe/", handler.Transcribe)
 

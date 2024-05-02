@@ -1,33 +1,20 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"prattl/render"
 	"prattl/transcribe"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-//// Logging
-
-func trace(s string) (string, time.Time) {
-	fmt.Println()
-	log.Println("START:", s)
-	return s, time.Now()
-}
-
-func un(s string, startTime time.Time) {
-	endTime := time.Now()
-	log.Println("END:", s, "took", endTime.Sub(startTime))
-	fmt.Println()
-}
-
-//// Logging
-
 var upgrader = websocket.Upgrader{}
+
+func Public(w http.ResponseWriter, r *http.Request) {
+	http.StripPrefix("/public/", http.FileServer(http.Dir("public/")))
+	http.NotFound(w, r)
+}
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -52,9 +39,6 @@ func Transcribe(w http.ResponseWriter, r *http.Request) {
 			log.Println("read:", err)
 			break
 		}
-
-		defer un(trace("transcribe.TranscribeLocal()"))
-		fmt.Println("transcribing...")
 		transcribe.TranscribeLocal(string(message))
 	}
 }
