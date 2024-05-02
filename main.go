@@ -2,15 +2,28 @@ package main
 
 import (
 	"fmt"
-	"html"
 	"log"
 	"net/http"
+	"os"
+	"prattl/handler"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello %q", html.EscapeString(r.URL.Path))
-	})
+	_ = godotenv.Load(".env")
+	port, portOk := os.LookupEnv("PORT")
+	if !portOk {
+		log.Fatal("Port not defined")
+	}
 
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/public/", handler.Public)
+	mux.HandleFunc("/", handler.Home)
+	mux.HandleFunc("/transcribe/", handler.Transcribe)
+
+	fmt.Println("✅ Prattl running")
+	fmt.Println(fmt.Sprintf("localhost%s", port))
+	err := http.ListenAndServe(port, mux)
+	log.Fatal(err)
 }
