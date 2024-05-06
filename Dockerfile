@@ -15,7 +15,7 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 # Download python packages
 COPY /transcribe/requirements.txt /app/requirements.txt
-RUN pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+RUN pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Download Go modules

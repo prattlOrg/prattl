@@ -22,17 +22,20 @@ func un(s string, startTime time.Time) {
 
 //// Logging
 
-func TranscribeLocal(base64 string) {
+func TranscribeLocal(base64 string) (transcription string, err error) {
 	defer un(trace("transcribe.TranscribeLocal()"))
-	cmd := exec.Command("python3", "transcribe/transcribe.py", base64)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
+
+	cmd := exec.Command("python3", "transcribe/transcribe.py", base64)
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-		return
+		return "", err
 	}
-	fmt.Print("Result: " + out.String())
+
+	output := out.String()
+	return output, nil
 }

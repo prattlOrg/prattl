@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"prattl/render"
@@ -9,35 +10,45 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
-
-// func Public(w http.ResponseWriter, r *http.Request) {
-// 	// http.NotFound(w, r)
-// }
-
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
-
 	templs := [2]string{"index", "recorder"}
-	render.RenderTemplate(w, r, templs[:])
+	err := render.RenderTemplate(w, templs[:])
+	if err != nil {
+		log.Println("template render error:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+var upgrader = websocket.Upgrader{}
+
+func reader(ws *websocket.Conn) {
+	for {
+		messageType, message, err := ws.ReadMessage()
+		if err != nil {
+			log.Println("reader error:", err)
+			return
+		}
+		transcription, err := transcribe.TranscribeLocal(string(message))
+		if err != nil {
+			log.Println("transcription error:", err)
+			return
+		}
+		fmt.Printf("Result: %s", transcription)
+		ws.WriteMessage(messageType, []byte(transcription))
+	}
 }
 
 func Transcribe(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
+	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("upgrade:", err)
+		log.Print("ws upgrade error:", err)
 		return
 	}
-	defer c.Close()
-	for {
-		_, message, err := c.ReadMessage()
-		if err != nil {
-			log.Println("read:", err)
-			break
-		}
-		transcribe.TranscribeLocal(string(message))
-	}
+	defer ws.Close()
+	reader(ws)
 }
