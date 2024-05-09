@@ -6,16 +6,16 @@ import (
 	"path"
 )
 
-func RenderTemplate(w http.ResponseWriter, r *http.Request, htmlTempls []string) {
+func RenderTemplate(w http.ResponseWriter, htmlTempls []string) (err error) {
 	var fpArray []string
-	for i := 0; i < len(htmlTempls); i++ {
+	for i := range htmlTempls {
 		fp := path.Join("public/html/", htmlTempls[i]+".html")
 		fpArray = append(fpArray, fp)
 	}
-
 	tmpl := template.Must(template.ParseFiles(fpArray...))
-	err := tmpl.Execute(w, nil)
+	err = tmpl.Execute(w, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
+	return nil
 }

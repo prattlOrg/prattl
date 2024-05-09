@@ -7,11 +7,8 @@ import (
 	"os"
 	"prattl/handler"
 
-	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 )
-
-var upgrader = websocket.Upgrader{}
 
 func main() {
 	_ = godotenv.Load(".env")
@@ -25,7 +22,7 @@ func main() {
 	mux.HandleFunc("/", handler.Home)
 	mux.HandleFunc("/transcribe/", handler.Transcribe)
 
-	fmt.Println("✅ Prattl running")
+	fmt.Println("✅ Prattl running!")
 	fmt.Println(fmt.Sprintf("localhost%s", port))
 	err := http.ListenAndServe(port, mux)
 	log.Fatal(err)
