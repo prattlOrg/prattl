@@ -9,71 +9,79 @@ rec_stop.disabled = true;
 let audioCtx;
 
 const blobToBase64 = (blob) => {
-	const reader = new FileReader();
-	reader.readAsDataURL(blob);
-	return new Promise((resolve) => {
-		reader.onloadend = () => {
-			resolve(reader.result);
-		};
-	});
+  const reader = new FileReader();
+  reader.readAsDataURL(blob);
+  return new Promise((resolve) => {
+    reader.onloadend = () => {
+      resolve(reader.result);
+    };
+  });
 };
 
 if (
-	navigator.mediaDevices.getUserMedia({
-		audio: {
-			channelCount: 1,
-			sampleRate: 44100,
-		},
-	})
+  navigator.mediaDevices.getUserMedia({
+    audio: {
+      channelCount: 1,
+      sampleRate: 44100,
+    },
+  })
 ) {
-	console.log("The mediaDevices.getUserMedia() method is supported.");
+  console.log("The mediaDevices.getUserMedia() method is supported.");
 
-	const constraints = { audio: true };
-	let chunks = [];
+  const constraints = { audio: true };
+  let chunks = [];
 
-	let onSuccess = function (stream) {
-		const options = { mimeType: "audio/webm" };
-		const mediaRecorder = new MediaRecorder(stream, options);
-		var socket = new WebSocket("ws://localhost:8080/transcribe/");
+  let onSuccess = function (stream) {
+    const options = { mimeType: "audio/webm" };
+    const mediaRecorder = new MediaRecorder(stream, options);
+    var socket = new WebSocket("ws://localhost:8080/transcribe/");
 
-		record.onclick = function () {
-			mediaRecorder.start();
-			record.style.background = "red";
-			rec_stop.disabled = false;
-			record.disabled = true;
-		};
+    let check = function () {
+      console.log("5 secs passed, requesting data");
+      mediaRecorder.requestData();
+    };
 
-		rec_stop.onclick = function () {
-			mediaRecorder.stop();
-			record.style.background = "";
-			record.style.color = "";
-			rec_stop.disabled = true;
-			record.disabled = false;
-		};
+    record.onclick = function () {
+      mediaRecorder.start();
+      window.setInterval(check, 5000);
+      record.style.background = "red";
+      rec_stop.disabled = false;
+      record.disabled = true;
+    };
 
-		mediaRecorder.onstop = function (e) {
-			console.log("recorder stopped");
-		};
+    rec_stop.onclick = function () {
+      mediaRecorder.stop();
+      record.style.background = "";
+      record.style.color = "";
+      rec_stop.disabled = true;
+      record.disabled = false;
+    };
 
-		mediaRecorder.ondataavailable = async function (e) {
-			chunks.push(e.data);
-			let reader = e.data.stream().getReader();
-			reader.read().then(async function processText({ done, value }) {
-				const blob = new Blob(chunks, { type: "audio/wav" });
-				const base64Blob = await blobToBase64(blob);
-				socket.send(base64Blob);
-				if (done) {
-					return;
-				}
-			});
-		};
-	};
+    mediaRecorder.onstop = function (e) {
+      window.clearInterval();
+      console.log("recorder stopped");
+    };
 
-	let onError = function (err) {
-		console.log("The following error occured: " + err);
-	};
+    mediaRecorder.ondataavailable = async function (e) {
+      console.log("dataavailable");
+      chunks.push(e.data);
+      let reader = e.data.stream().getReader();
+      reader.read().then(async function processText({ done, value }) {
+        const blob = new Blob(chunks, { type: "audio/wav" });
+        const base64Blob = await blobToBase64(blob);
+        socket.send(base64Blob);
+        if (done) {
+          return;
+        }
+      });
+    };
+  };
 
-	navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
+  let onError = function (err) {
+    console.log("The following error occured: " + err);
+  };
+
+  navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
 } else {
-	console.log("MediaDevices.getUserMedia() not supported on your browser!");
+  console.log("MediaDevices.getUserMedia() not supported on your browser!");
 }
