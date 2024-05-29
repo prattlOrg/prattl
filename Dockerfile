@@ -18,6 +18,7 @@ COPY /transcribe/requirements.txt /app/requirements.txt
 RUN pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+
 # Download Go modules
 COPY go.mod go.sum ./
 RUN go mod download

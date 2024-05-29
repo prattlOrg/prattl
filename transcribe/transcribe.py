@@ -35,7 +35,7 @@ def transcribe (base64_bytes) :
     print(result["text"])
 
 def main ():
-    base64_encoded = sys.argv[1]
+    base64_encoded = sys.stdin.read().strip()
     base64_bytes = base64_to_bytes(base64_encoded)
     transcribe(base64_bytes)
 

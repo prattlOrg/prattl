@@ -20,18 +20,31 @@ func un(s string, startTime time.Time) {
 	log.Println("END:", s, "took", endTime.Sub(startTime))
 }
 
-//// Logging
-
 func TranscribeLocal(base64 string) (transcription string, err error) {
 	defer un(trace("transcribe.TranscribeLocal()"))
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 
-	cmd := exec.Command("python3", "transcribe/transcribe.py", base64)
+	cmd := exec.Command("python3", "transcribe/transcribe.py")
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return "", err
+	}
+
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
-	err = cmd.Run()
+
+	if err = cmd.Start(); err != nil {
+		return "", err
+	}
+
+	_, err = stdin.Write([]byte(base64))
 	if err != nil {
+		return "", err
+	}
+	stdin.Close()
+
+	if err = cmd.Wait(); err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		return "", err
 	}

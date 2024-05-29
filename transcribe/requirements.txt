@@ -2,3 +2,5 @@
 # torchaudio
 transformers
 accelerate
+soundfile
+numpy

@@ -37,13 +37,13 @@ if (
     var socket = new WebSocket("ws://localhost:8080/transcribe/");
 
     let check = function () {
-      console.log("5 secs passed, requesting data");
+      console.log("2 secs passed, requesting data");
       mediaRecorder.requestData();
     };
 
     record.onclick = function () {
       mediaRecorder.start();
-      window.setInterval(check, 5000);
+      window.setInterval(check, 2000);
       record.style.background = "red";
       rec_stop.disabled = false;
       record.disabled = true;
