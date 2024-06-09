@@ -1,8 +1,9 @@
 # prattl
 
-Live caption overlay for streaming
+CLI tool for transcription
 
-# For getting the container running
+## Get Started
 
-`docker build --tag prattl .`
-`docker run --env-file .env -p 8080:8080 -it prattl`
+1. Clone repository
+2. In the base directory, run `/pip_install.sh` to get python dependencies (found in `internal/python-libs/requirements.txt`) installed to `internal/python-libs/data`
+3. In the base directory of the project, run `go build` to get executable in working directory or `go install` to move the executable file to $GOPATH/bin
