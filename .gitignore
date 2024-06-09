@@ -23,3 +23,5 @@ go.work
 .env
 
 .DS_Store
+
+internal/python-libs/data
