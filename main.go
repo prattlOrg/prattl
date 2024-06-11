@@ -1,7 +1,11 @@
 package main
 
-import "prattl/cmd"
+import (
+	"prattl/cmd"
+	"prattl/internal/pyenv"
+)
 
 func main() {
+	pyenv.Main()
 	cmd.Execute()
 }
