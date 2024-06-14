@@ -13,26 +13,27 @@ func init() {
 }
 
 var transcribeCmd = &cobra.Command{
-	Use:   "transcribe",
+	Use:   "transcribe <filepath/to/audio.mp3>",
 	Short: "Transcribe the provided audio file (file path)",
 	Long:  `This command transcribes the provided audiofile and prints the resulting string`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
-			return fmt.Errorf("no file path provided")
+			return fmt.Errorf("no file path provided\n")
 		}
-		err := transcribe(args[0])
+		transcription, err := transcribe(args[0])
 		if err != nil {
 			return err
 		}
+		fmt.Println(transcription)
 		return nil
 	},
 }
 
-func transcribe(fp string) error {
+func transcribe(fp string) (string, error) {
 	ep, err := python.NewEmbeddedPython("transcribe")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var out bytes.Buffer
@@ -75,29 +76,22 @@ if __name__ == "__main__":
     main()`, fp)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return err
+		return "", err
 	}
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	if err = cmd.Start(); err != nil {
-		return err
+		return "", err
 	}
 	_, err = stdin.Write([]byte(fp))
 	if err != nil {
-		return err
+		return "", err
 	}
 	stdin.Close()
 	if err = cmd.Wait(); err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-		return err
+		return "", err
 	}
 	output := out.String()
-	fmt.Println(output)
-	return nil
-	// cmd.Stdout = os.Stdout
-	// cmd.Stderr = os.Stderr
-	// err = cmd.Run()
-	// if err != nil {
-	// 	return err
-	// }
+	return output, nil
 }

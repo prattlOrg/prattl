@@ -7,9 +7,10 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "prattl",
-	Short: "Prattl is a transcription tool",
-	Long:  `A transcription tool built with Go and Python. Complete documentation is available at https://github.com/benleem/prattl`,
+	Use:     "prattl",
+	Short:   "Prattl is a transcription tool",
+	Long:    `A transcription tool built with Go and Python. Complete documentation is available at https://github.com/benleem/prattl`,
+	Version: "0.01",
 }
 
 func Execute() {
