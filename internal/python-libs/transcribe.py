@@ -2,8 +2,9 @@ import sys
 # import torch
 # from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 
-def transcribe (fp) :
-    sys.stdout.write(fp)
+def transcribe (file_bytes) :
+    # sys.stdout.write(file_bytes)
+    print(file_bytes)
 #     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 #     # device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 #     torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
@@ -28,8 +29,8 @@ def transcribe (fp) :
 #     print(result["text"])
 
 def main ():
-    fp = sys.stdin.read().strip()
-    transcribe(fp)
+    file_bytes = sys.stdin.buffer.read()
+    transcribe(file_bytes)
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/kluctl/go-embed-python/python"
 	"github.com/spf13/cobra"
@@ -31,20 +32,23 @@ var transcribeCmd = &cobra.Command{
 }
 
 func transcribe(fp string) (string, error) {
+	fileBytes, err := ioutil.ReadFile(fp) //read the content of file
+	if err != nil {
+		return "", err
+	}
+
 	ep, err := python.NewEmbeddedPython("transcribe")
 	if err != nil {
 		return "", err
 	}
 
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd := ep.PythonCmd("-c", `import base64
-import sys
+	cmd := ep.PythonCmd("-c", `import sys
 # import torch
 # from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 
-def transcribe (fp) :
-    sys.stdout.write(fp)
+def transcribe (file_bytes) :
+    # sys.stdout.write(file_bytes)
+    print(file_bytes)
 #     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 #     # device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 #     torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
@@ -69,11 +73,15 @@ def transcribe (fp) :
 #     print(result["text"])
 
 def main ():
-    fp = sys.stdin.read().strip()
-    transcribe(fp)
+    file_bytes = sys.stdin.buffer.read()
+    transcribe(file_bytes)
 
 if __name__ == "__main__":
-    main()`, fp)
+    main()`)
+
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return "", err
@@ -83,7 +91,7 @@ if __name__ == "__main__":
 	if err = cmd.Start(); err != nil {
 		return "", err
 	}
-	_, err = stdin.Write([]byte(fp))
+	_, err = stdin.Write(fileBytes)
 	if err != nil {
 		return "", err
 	}
