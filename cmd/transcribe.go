@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"prattl/internal/python-libs/data"
+	pysrc "prattl/python-src"
 
+	"github.com/kluctl/go-embed-python/embed_util"
 	"github.com/kluctl/go-embed-python/python"
 	"github.com/spf13/cobra"
 )
@@ -32,50 +35,27 @@ var transcribeCmd = &cobra.Command{
 }
 
 func transcribe(fp string) (string, error) {
-	fileBytes, err := os.ReadFile(fp) //read the content of file
+	fileBytes, err := os.ReadFile(fp)
 	if err != nil {
 		return "", err
 	}
 
-	ep, err := python.NewEmbeddedPython("transcribe")
+	tmpDir := "prattl-embedded"
+	ep, err := python.NewEmbeddedPythonWithTmpDir(tmpDir+"-python", true)
 	if err != nil {
 		return "", err
 	}
+	prattlLib, err := embed_util.NewEmbeddedFilesWithTmpDir(data.Data, tmpDir+"-lib", true)
+	if err != nil {
+		return "", err
+	}
+	ep.AddPythonPath(prattlLib.GetExtractedPath())
 
-	cmd := ep.PythonCmd("-c", `import sys
-import torch
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
-
-def transcribe (file_bytes) :
-    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-
-    model_id = "distil-whisper/distil-medium.en"
-    model = AutoModelForSpeechSeq2Seq.from_pretrained(
-        model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
-    )
-    model.to(device)
-    processor = AutoProcessor.from_pretrained(model_id)
-    
-    pipe = pipeline(
-        "automatic-speech-recognition",
-        model=model,
-        tokenizer=processor.tokenizer,
-        feature_extractor=processor.feature_extractor,
-        max_new_tokens=128,
-        torch_dtype=torch_dtype,
-        device=device,
-    )
-    result = pipe(file_bytes, return_timestamps=True)
-    sys.stdout.write(result["text"])
-
-def main ():
-    file_bytes = sys.stdin.buffer.read()
-    transcribe(file_bytes)
-
-if __name__ == "__main__":
-    main()`)
+	py, err := pysrc.ReturnSrc()
+	if err != nil {
+		return "", err
+	}
+	cmd := ep.PythonCmd("-c", py)
 
 	var out bytes.Buffer
 	var stderr bytes.Buffer

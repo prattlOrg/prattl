@@ -1,6 +1,8 @@
 package main
 
-import "prattl/cmd"
+import (
+	"prattl/cmd"
+)
 
 func main() {
 	cmd.Execute()
