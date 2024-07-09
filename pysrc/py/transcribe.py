@@ -28,8 +28,6 @@ def transcribe (file_bytes) :
 
 def main ():
     file_bytes = sys.stdin.buffer.read()
-    # print(str(file_bytes))
-    # sys.stdout.write(str(file_bytes))
     transcribe(file_bytes)
 
 if __name__ == "__main__":
