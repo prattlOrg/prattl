@@ -2,7 +2,8 @@ package main
 
 import (
 	"prattl/cmd"
-	"prattl/internal/pyenv"
+
+	pyenv "github.com/voidKandy/go-pyenv"
 )
 
 func main() {
