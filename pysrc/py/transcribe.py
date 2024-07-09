@@ -27,10 +27,10 @@ def transcribe (file_bytes) :
     sys.stdout.write(result["text"])
 
 def main ():
-    file_bytes = sys.stdin.read()
-    print(str(file_bytes))
+    file_bytes = sys.stdin.buffer.read()
+    # print(str(file_bytes))
     # sys.stdout.write(str(file_bytes))
-    # transcribe(file_bytes)
+    transcribe(file_bytes)
 
 if __name__ == "__main__":
     main()

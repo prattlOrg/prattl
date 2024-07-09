@@ -44,11 +44,22 @@ func transcribe(fp string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	program, err := pysrc.ReturnSrc()
+	program, err := pysrc.ReturnFile("transcribe.py")
 	if err != nil {
 		return "", err
 	}
-	env := pyenv.DefaultPyEnv()
+
+	// BAD!!!!
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	env := pyenv.PyEnv{
+		ParentPath: home + "/.prattl/",
+	}
+
 	args := [2]string{"-c", program}
 	cmd := env.ExecutePython(args[:])
 
@@ -56,22 +67,22 @@ func transcribe(fp string) (string, error) {
 	var stderr bytes.Buffer
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return "", fmt.Errorf(stderr.String())
+		return "", fmt.Errorf("error instantiating pipe: " + err.Error())
 	}
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	if err = cmd.Start(); err != nil {
-		return "", fmt.Errorf(stderr.String())
+		return "", fmt.Errorf("error starting command: " + err.Error())
 	}
 	_, err = stdin.Write(fileBytes)
 	// var value []byte = []byte("Hello, world")
 	// _, err = stdin.Write(value)
 	if err != nil {
-		return "", fmt.Errorf(stderr.String())
+		return "", fmt.Errorf("error writing to stdin: " + stderr.String())
 	}
 	stdin.Close()
 	if err = cmd.Wait(); err != nil {
-		return "", fmt.Errorf(stderr.String())
+		return "", fmt.Errorf("error waiting for command: " + stderr.String())
 	}
 	output := out.String()
 	return output, nil

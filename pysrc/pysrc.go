@@ -4,11 +4,11 @@ import (
 	"embed"
 )
 
-//go:embed transcribe.py
-var pythonSrc embed.FS
+//go:embed py
+var PythonSrc embed.FS
 
-func ReturnSrc() (string, error) {
-	data, err := pythonSrc.ReadFile("transcribe.py")
+func ReturnFile(fp string) (string, error) {
+	data, err := PythonSrc.ReadFile("py/" + fp)
 	if err != nil {
 		return "", err
 	}
