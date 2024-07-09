@@ -2,7 +2,6 @@ import sys
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 
-
 def transcribe (file_bytes) :
     # device = "cuda:0" if torch.cuda.is_available() else "cpu"
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -26,11 +25,12 @@ def transcribe (file_bytes) :
     )
     result = pipe(file_bytes, return_timestamps=True)
     sys.stdout.write(result["text"])
-    # sys.stdout.write(file_bytes)
 
 def main ():
     file_bytes = sys.stdin.read()
-    transcribe(file_bytes)
+    print(str(file_bytes))
+    # sys.stdout.write(str(file_bytes))
+    # transcribe(file_bytes)
 
 if __name__ == "__main__":
     main()

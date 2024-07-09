@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"prattl/internal/python-libs/data"
-	pysrc "prattl/python-src"
+	"prattl/pysrc"
 
-	"github.com/kluctl/go-embed-python/embed_util"
-	"github.com/kluctl/go-embed-python/python"
 	"github.com/spf13/cobra"
+	"github.com/voidKandy/go-pyenv/pyenv"
 )
 
 func init() {
@@ -23,7 +21,7 @@ var transcribeCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
-			return fmt.Errorf("no file path provided\n")
+			return fmt.Errorf("%s", "no file path provided\n")
 		}
 		transcription, err := transcribe(args[0])
 		if err != nil {
@@ -35,31 +33,27 @@ var transcribeCmd = &cobra.Command{
 }
 
 func transcribe(fp string) (string, error) {
+	// fileInfo, err := os.Stat(fp)
+	// if err != nil {
+	// 	return "", fmt.Errorf("%s\n", err)
+	// }
+	// fileSize := fmt.Sprintf(", size: %.2fmb", float64(fileInfo.Size())/1048576)
+	// return fileInfo.Name() + fileSize, nil
+
 	fileBytes, err := os.ReadFile(fp)
 	if err != nil {
 		return "", err
 	}
-
-	tmpDir := "prattl-embedded"
-	ep, err := python.NewEmbeddedPythonWithTmpDir(tmpDir+"-python", true)
+	program, err := pysrc.ReturnSrc()
 	if err != nil {
 		return "", err
 	}
-	prattlLib, err := embed_util.NewEmbeddedFilesWithTmpDir(data.Data, tmpDir+"-lib", true)
-	if err != nil {
-		return "", err
-	}
-	ep.AddPythonPath(prattlLib.GetExtractedPath())
-
-	py, err := pysrc.ReturnSrc()
-	if err != nil {
-		return "", err
-	}
-	cmd := ep.PythonCmd("-c", py)
+	env := pyenv.DefaultPyEnv()
+	args := [2]string{"-c", program}
+	cmd := env.ExecutePython(args[:])
 
 	var out bytes.Buffer
 	var stderr bytes.Buffer
-
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return "", fmt.Errorf(stderr.String())
@@ -70,6 +64,8 @@ func transcribe(fp string) (string, error) {
 		return "", fmt.Errorf(stderr.String())
 	}
 	_, err = stdin.Write(fileBytes)
+	// var value []byte = []byte("Hello, world")
+	// _, err = stdin.Write(value)
 	if err != nil {
 		return "", fmt.Errorf(stderr.String())
 	}

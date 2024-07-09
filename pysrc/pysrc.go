@@ -5,10 +5,10 @@ import (
 )
 
 //go:embed transcribe.py
-var f embed.FS
+var pythonSrc embed.FS
 
 func ReturnSrc() (string, error) {
-	data, err := f.ReadFile("transcribe.py")
+	data, err := pythonSrc.ReadFile("transcribe.py")
 	if err != nil {
 		return "", err
 	}

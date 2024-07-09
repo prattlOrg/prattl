@@ -22,9 +22,10 @@
 go.work
 
 prattl-embedded*
+ffmpeg
 
 .env
 
 .DS_Store
 
-internal/python-libs/data
+dist
