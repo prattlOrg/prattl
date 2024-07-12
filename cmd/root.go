@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/voidKandy/go-pyenv/pyenv"
 )
 
 var rootCmd = &cobra.Command{
@@ -13,7 +14,7 @@ var rootCmd = &cobra.Command{
 	Version: "0.01",
 }
 
-func Execute() {
+func Execute(pyenv pyenv.PyEnv) {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}

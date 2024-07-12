@@ -21,11 +21,6 @@
 # Go workspace file
 go.work
 
-prattl-embedded*
-ffmpeg
-
 .env
 
 .DS_Store
-
-dist

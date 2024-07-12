@@ -6,7 +6,8 @@ toolchain go1.22.5
 
 require (
 	github.com/spf13/cobra v1.8.0
-	github.com/voidKandy/go-pyenv v0.1.4
+	github.com/voidKandy/go-pyenv v0.1.52
+
 )
 
 require (

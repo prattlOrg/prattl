@@ -55,14 +55,11 @@ func transcribe(fp string) (string, error) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 	env := pyenv.PyEnv{
 		ParentPath: home + "/.prattl/",
 	}
 
-	args := [2]string{"-c", program}
-	cmd := env.ExecutePython(args[:])
-
+	cmd := env.ExecutePython("-c", program)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	stdin, err := cmd.StdinPipe()
@@ -75,8 +72,6 @@ func transcribe(fp string) (string, error) {
 		return "", fmt.Errorf("error starting command: " + err.Error())
 	}
 	_, err = stdin.Write(fileBytes)
-	// var value []byte = []byte("Hello, world")
-	// _, err = stdin.Write(value)
 	if err != nil {
 		return "", fmt.Errorf("error writing to stdin: " + stderr.String())
 	}
