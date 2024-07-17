@@ -1,6 +1,0 @@
-torch
-torchaudio
-transformers
-accelerate
-soundfile
-numpy

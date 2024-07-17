@@ -17,13 +17,10 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+
 # Go workspace file
 go.work
 
 .env
 
 .DS_Store
-
-internal/python-libs/data
-apple-darwin.extracted
-cpython-3.12.3+20240415-aarch64-apple-darwin-pgo+lto-full.tar.zst

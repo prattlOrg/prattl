@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"os"
+	"prattl/pysrc"
 
 	"github.com/spf13/cobra"
-	pyenv "github.com/voidKandy/go-pyenv/pyenv"
+	"github.com/voidKandy/go-pyenv/pyenv"
 )
 
 func init() {
@@ -12,75 +15,70 @@ func init() {
 }
 
 var transcribeCmd = &cobra.Command{
-	Use:   "transcribe",
+	Use:   "transcribe <filepath/to/audio.mp3>",
 	Short: "Transcribe the provided audio file (file path)",
 	Long:  `This command transcribes the provided audiofile and prints the resulting string`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
-			return fmt.Errorf("no file path provided")
+			return fmt.Errorf("%s", "no file path provided\n")
 		}
-		err := transcribe(args[0])
+		transcription, err := transcribe(args[0])
 		if err != nil {
 			return err
 		}
+		fmt.Println(transcription)
 		return nil
 	},
 }
 
-func transcribe(fp string) error {
-	env := pyenv.DefaultPyEnv()
-
-	args := []string{
-		"-c",
-		`import base64
-		import sys
-		# import torch
-		# from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
-
-		def transcribe (fp) :
-			sys.stdout.write(fp)
-		#     device = "cuda:0" if torch.cuda.is_available() else "cpu"
-		#     # device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-		#     torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-
-		#     model_id = "distil-whisper/distil-medium.en"
-		#     model = AutoModelForSpeechSeq2Seq.from_pretrained(
-		#         model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
-		#     )
-		#     model.to(device)
-		#     processor = AutoProcessor.from_pretrained(model_id)
-			
-		#     pipe = pipeline(
-		#         "automatic-speech-recognition",
-		#         model=model,
-		#         tokenizer=processor.tokenizer,
-		#         feature_extractor=processor.feature_extractor,
-		#         max_new_tokens=128,
-		#         torch_dtype=torch_dtype,
-		#         device=device,
-		#     )
-		#     result = pipe(base64_bytes, return_timestamps=True)
-		#     print(result["text"])
-
-		def main ():
-			fp = sys.stdin.read().strip()
-			transcribe(fp)
-
-		if __name__ == "__main__":
-			main()`,
-	}
-	stdout, err := env.ExecutePython(args)
-	// stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return err
-	}
-	fmt.Println(stdout)
-	return nil
-	// cmd.Stdout = os.Stdout
-	// cmd.Stderr = os.Stderr
-	// err = cmd.Run()
+func transcribe(fp string) (string, error) {
+	// fileInfo, err := os.Stat(fp)
 	// if err != nil {
-	// 	return err
+	// 	return "", fmt.Errorf("%s\n", err)
 	// }
+	// fileSize := fmt.Sprintf(", size: %.2fmb", float64(fileInfo.Size())/1048576)
+	// return fileInfo.Name() + fileSize, nil
+
+	fileBytes, err := os.ReadFile(fp)
+	if err != nil {
+		return "", err
+	}
+	program, err := pysrc.ReturnFile("transcribe.py")
+	if err != nil {
+		return "", err
+	}
+
+	// BAD!!!!
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	env := pyenv.PyEnv{
+		ParentPath: home + "/.prattl/",
+	}
+
+	cmd := env.ExecutePython("-c", program)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return "", fmt.Errorf("error instantiating pipe: " + err.Error())
+	}
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	if err = cmd.Start(); err != nil {
+		return "", fmt.Errorf("error starting command: " + err.Error())
+	}
+	_, err = stdin.Write(fileBytes)
+	if err != nil {
+		return "", fmt.Errorf("error writing to stdin: " + stderr.String())
+	}
+	stdin.Close()
+	if err = cmd.Wait(); err != nil {
+		return "", fmt.Errorf("error waiting for command: " + stderr.String())
+	}
+	output := out.String()
+	return output, nil
 }
