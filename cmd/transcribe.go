@@ -7,7 +7,6 @@ import (
 	"prattl/pysrc"
 
 	"github.com/spf13/cobra"
-	"github.com/voidKandy/go-pyenv/pyenv"
 )
 
 func init() {
@@ -33,13 +32,6 @@ var transcribeCmd = &cobra.Command{
 }
 
 func transcribe(fp string) (string, error) {
-	// fileInfo, err := os.Stat(fp)
-	// if err != nil {
-	// 	return "", fmt.Errorf("%s\n", err)
-	// }
-	// fileSize := fmt.Sprintf(", size: %.2fmb", float64(fileInfo.Size())/1048576)
-	// return fileInfo.Name() + fileSize, nil
-
 	fileBytes, err := os.ReadFile(fp)
 	if err != nil {
 		return "", err
@@ -49,16 +41,16 @@ func transcribe(fp string) (string, error) {
 		return "", err
 	}
 
-	// BAD!!!!
-	home, err := os.UserHomeDir()
+	env, err := pysrc.PrattlEnv()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Error getting prattl env: %v\n", err)
 		os.Exit(1)
 	}
-	env := pyenv.PyEnv{
-		ParentPath: home + "/.prattl/",
+	err = pysrc.PrepareDistribution(*env)
+	if err != nil {
+		fmt.Printf("Error preparing prattl distribution: %v\n", err)
+		os.Exit(1)
 	}
-
 	cmd := env.ExecutePython("-c", program)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
