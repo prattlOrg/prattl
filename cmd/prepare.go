@@ -2,11 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"prattl/pysrc"
-	"time"
 
-	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
 )
 
@@ -25,10 +22,7 @@ var prepareCommand = &cobra.Command{
 			return fmt.Errorf("Error getting prattl env: %v\n", err)
 		}
 
-		s := spinner.New(spinner.CharSets[35], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
-		s.Suffix = "\n"
-		s.Start()
-		err = pysrc.PrepareDistribution(*env, s)
+		err = pysrc.PrepareDistribution(*env)
 		if err != nil {
 			if err.Error() == "dist exists" {
 				fmt.Println("prattl distribution already prepared")
@@ -37,7 +31,6 @@ var prepareCommand = &cobra.Command{
 			return fmt.Errorf("Error preparing distribution env: %v\n", err)
 		}
 
-		s.Stop()
 		fmt.Println("Successfully prepared prattl distribution")
 		return nil
 	},

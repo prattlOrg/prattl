@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/briandowns/spinner"
 	"github.com/voidKandy/go-pyenv/pyenv"
@@ -33,20 +34,27 @@ func PrattlEnv() (*pyenv.PyEnv, error) {
 	return &env, nil
 }
 
-func PrepareDistribution(env pyenv.PyEnv, s *spinner.Spinner) error {
+func PrepareDistribution(env pyenv.PyEnv) error {
 	exists, _ := env.DistExists()
+	s := spinner.New(spinner.CharSets[35], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 	if !*exists {
+		s.Suffix = "\n"
+		s.Start()
 		s.Prefix = "installing python distribution: "
 		// mac install needs to return error
 		env.MacInstall()
 		s.Prefix = "downloading dependencies: "
+		s.Restart()
 		err := downloadDeps(env)
 		if err != nil {
+			s.Stop()
 			return fmt.Errorf("Error downloading prattl dependencies: %v\n", err)
 		}
 	} else {
+		s.Stop()
 		return fmt.Errorf("dist exists")
 	}
+	s.Stop()
 	return nil
 }
 
