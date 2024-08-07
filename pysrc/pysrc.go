@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/briandowns/spinner"
 	"github.com/voidKandy/go-pyenv/pyenv"
 )
 
@@ -32,11 +33,13 @@ func PrattlEnv() (*pyenv.PyEnv, error) {
 	return &env, nil
 }
 
-func PrepareDistribution(env pyenv.PyEnv) error {
+func PrepareDistribution(env pyenv.PyEnv, s *spinner.Spinner) error {
 	exists, _ := env.DistExists()
 	if !*exists {
+		s.Prefix = "installing python distribution: "
 		// mac install needs to return error
 		env.MacInstall()
+		s.Prefix = "downloading dependencies: "
 		err := downloadDeps(env)
 		if err != nil {
 			return fmt.Errorf("Error downloading prattl dependencies: %v\n", err)
