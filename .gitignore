@@ -24,3 +24,5 @@ go.work
 .env
 
 .DS_Store
+
+test_audio

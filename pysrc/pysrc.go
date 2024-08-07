@@ -2,7 +2,6 @@ package pysrc
 
 import (
 	"embed"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -27,24 +26,16 @@ func PrattlEnv() (*pyenv.PyEnv, error) {
 		return nil, err
 	}
 	parentPath := filepath.Join(home, ".prattl/")
-
-	_, err = os.Stat(parentPath)
-	if errors.Is(err, os.ErrNotExist) {
-		err = os.Mkdir(parentPath, 0777)
-		if err != nil {
-			return nil, fmt.Errorf("Error creating .prattl directory: %v", err)
-		}
-	}
 	env := pyenv.PyEnv{
 		ParentPath: parentPath,
 	}
-
 	return &env, nil
 }
 
 func PrepareDistribution(env pyenv.PyEnv) error {
 	exists, _ := env.DistExists()
 	if !*exists {
+		// mac install needs to return error
 		env.MacInstall()
 		err := downloadDeps(env)
 		if err != nil {
@@ -61,13 +52,11 @@ func downloadDeps(env pyenv.PyEnv) error {
 	if err != nil {
 		return err
 	}
-
 	path := filepath.Join(env.ParentPath, "requirements.txt")
 	err = os.WriteFile(path, []byte(reqs), 0o640)
 	if err != nil {
 		return err
 	}
-
 	err = env.AddDependencies(path)
 	if err != nil {
 		return err

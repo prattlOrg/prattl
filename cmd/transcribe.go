@@ -46,11 +46,6 @@ func transcribe(fp string) (string, error) {
 		fmt.Printf("Error getting prattl env: %v\n", err)
 		os.Exit(1)
 	}
-	err = pysrc.PrepareDistribution(*env)
-	if err != nil {
-		fmt.Printf("Error preparing prattl distribution: %v\n", err)
-		os.Exit(1)
-	}
 	cmd := env.ExecutePython("-c", program)
 	var out bytes.Buffer
 	var stderr bytes.Buffer

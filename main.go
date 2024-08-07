@@ -5,7 +5,6 @@ import (
 	"os"
 	"prattl/cmd"
 	ffmpeg "prattl/internal"
-	"prattl/pysrc"
 )
 
 func main() {
@@ -14,12 +13,9 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	env, err := pysrc.PrattlEnv()
 	if err != nil {
 		fmt.Printf("error creating prattl env: %v\n", err)
 		os.Exit(1)
 	}
-	// pysrc.PrepareDistribution(*env)
-	cmd.Execute(*env)
+	cmd.Execute()
 }
