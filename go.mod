@@ -1,17 +1,17 @@
-module prattl
+module github.com/benleem/prattl
 
 go 1.21.3
 
 toolchain go1.22.5
 
 require (
+	github.com/briandowns/spinner v1.23.1
 	github.com/spf13/cobra v1.8.0
-	github.com/voidKandy/go-pyenv v0.1.54
+	github.com/voidKandy/go-pyenv v0.1.65
 
 )
 
 require (
-	github.com/briandowns/spinner v1.23.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect

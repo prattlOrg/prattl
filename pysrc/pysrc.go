@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
-
-	"github.com/briandowns/spinner"
+	"runtime"
+	"strings"
+  
 	"github.com/voidKandy/go-pyenv/pyenv"
 )
 
@@ -27,43 +27,48 @@ func PrattlEnv() (*pyenv.PyEnv, error) {
 	if err != nil {
 		return nil, err
 	}
-	parentPath := filepath.Join(home, ".prattl/")
+	parentPath := filepath.Join(home, ".prattl")
+	osArch := fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
 	env := pyenv.PyEnv{
-		ParentPath: parentPath,
+		ParentPath:   parentPath,
+		Distribution: osArch,
 	}
 	return &env, nil
 }
 
 func PrepareDistribution(env pyenv.PyEnv) error {
 	exists, _ := env.DistExists()
-	s := spinner.New(spinner.CharSets[35], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 	if !*exists {
-		s.Suffix = "\n"
-		s.Start()
-		s.Prefix = "installing python distribution: "
-		// mac install needs to return error
-		env.MacInstall()
-		s.Prefix = "downloading dependencies: "
-		s.Restart()
+		// s.Prefix = "installing python distribution: "
+		// install needs to return error
+		env.Install()
+		// s.Prefix = "downloading dependencies: "
 		err := downloadDeps(env)
 		if err != nil {
-			s.Stop()
-			return fmt.Errorf("Error downloading prattl dependencies: %v\n", err)
+			return fmt.Errorf("error downloading prattl dependencies: %v\n", err)
 		}
 	} else {
-		s.Stop()
 		return fmt.Errorf("dist exists")
 	}
-	s.Stop()
 	return nil
 }
 
 func downloadDeps(env pyenv.PyEnv) error {
-	reqs, err := ReturnFile("requirements.txt")
+	var requirementsFp string
+	switch {
+	case strings.Contains(env.Distribution, "darwin"):
+		requirementsFp = "requirements-darwin.txt"
+	case strings.Contains(env.Distribution, "linux"):
+		requirementsFp = "requirements-linux.txt"
+	case strings.Contains(env.Distribution, "windows"):
+		requirementsFp = "requirements-windows.txt"
+	}
+
+	reqs, err := ReturnFile(requirementsFp)
 	if err != nil {
 		return err
 	}
-	path := filepath.Join(env.ParentPath, "requirements.txt")
+	path := filepath.Join(env.ParentPath, requirementsFp)
 	err = os.WriteFile(path, []byte(reqs), 0o640)
 	if err != nil {
 		return err
