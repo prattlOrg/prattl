@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-  
+
 	"github.com/voidKandy/go-pyenv/pyenv"
 )
 
@@ -42,7 +42,7 @@ func PrepareDistribution(env pyenv.PyEnv) error {
 		// s.Prefix = "installing python distribution: "
 		// install needs to return error
 		env.Install()
-		// s.Prefix = "downloading dependencies: "
+		// s.Prefix = "downloading dependencies:"
 		err := downloadDeps(env)
 		if err != nil {
 			return fmt.Errorf("error downloading prattl dependencies: %v\n", err)
