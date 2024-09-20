@@ -88,7 +88,7 @@ func transcribe(fps []string) ([]string, error) {
 
 	output := out.String()
 
-	returnStrings = strings.Split(output, embed.SeparatorExpectedString)
+	returnStrings = strings.Split(strings.ToLower(output), embed.SeparatorExpectedString)
 
 	return returnStrings, nil
 }

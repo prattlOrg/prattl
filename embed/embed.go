@@ -5,4 +5,4 @@ import _ "embed"
 //go:embed code.mp3
 var CodeBytes []byte
 
-const SeparatorExpectedString = "597 ABLKFG8."
+const SeparatorExpectedString = "crimson falcon, silent thunder, midnight echo"

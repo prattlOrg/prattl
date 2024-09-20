@@ -26,3 +26,6 @@ go.work
 .DS_Store
 
 test_audio
+
+test1.mp3
+test2.mp3
