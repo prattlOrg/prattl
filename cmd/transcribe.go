@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -25,16 +26,31 @@ var transcribeCmd = &cobra.Command{
 		if len(args) == 0 {
 			return fmt.Errorf("%s", "no file path provided\n")
 		}
+
+		transcriptionMap := make(map[string]string)
 		transcriptions, err := transcribe(args)
 		if err != nil {
 			return err
 		}
-		for _, trans := range transcriptions {
-			_, err := io.WriteString(os.Stdout, trans+"\n")
-			if err != nil {
-				return fmt.Errorf("error writing to stdout: %v", err)
-			}
+
+		for i, trans := range transcriptions {
+			transcriptionMap[args[i]] = trans
+			// _, err := io.WriteString(os.Stdout, trans+"\n")
+			// if err != nil {
+			// 	return fmt.Errorf("error writing to stdout: %v", err)
+			// }
 		}
+
+		jsonOutput, err := json.Marshal(transcriptionMap)
+		if err != nil {
+			return fmt.Errorf("error marshaling to JSON: %v", err)
+		}
+
+		_, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
+		if err != nil {
+			return fmt.Errorf("error writing to stdout: %v", err)
+		}
+
 		return nil
 	},
 }
@@ -89,6 +105,10 @@ func transcribe(fps []string) ([]string, error) {
 	output := out.String()
 
 	returnStrings = strings.Split(strings.ToLower(output), embed.SeparatorExpectedString)
+
+	for _, str := range returnStrings {
+		str = fmt.Sprintf("---%s---\n", str)
+	}
 
 	return returnStrings, nil
 }
