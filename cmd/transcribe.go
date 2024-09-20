@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"prattl/pysrc"
 	"strings"
@@ -28,7 +29,10 @@ var transcribeCmd = &cobra.Command{
 			return err
 		}
 		for _, trans := range transcriptions {
-			fmt.Println(trans)
+			_, err := io.WriteString(os.Stdout, trans+"\n")
+			if err != nil {
+				return fmt.Errorf("error writing to stdout: %v", err)
+			}
 		}
 		return nil
 	},
