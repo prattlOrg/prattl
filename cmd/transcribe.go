@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"prattl/embed"
 	"prattl/pysrc"
 	"strings"
 
@@ -39,12 +40,7 @@ var transcribeCmd = &cobra.Command{
 }
 
 func transcribe(fps []string) ([]string, error) {
-	separatorBytes, err := os.ReadFile("code.mp3")
-	separatorExpectedString := "597 ABLKFG8."
 	returnStrings := []string{}
-	if err != nil {
-		return returnStrings, err
-	}
 
 	var allBytes []byte
 	for i, fp := range fps {
@@ -55,7 +51,7 @@ func transcribe(fps []string) ([]string, error) {
 		allBytes = append(allBytes, fileBytes...)
 
 		if i < len(fps)-1 {
-			allBytes = append(allBytes, separatorBytes...)
+			allBytes = append(allBytes, embed.CodeBytes...)
 		}
 
 	}
@@ -92,7 +88,7 @@ func transcribe(fps []string) ([]string, error) {
 
 	output := out.String()
 
-	returnStrings = strings.Split(output, separatorExpectedString)
+	returnStrings = strings.Split(output, embed.SeparatorExpectedString)
 
 	return returnStrings, nil
 }
