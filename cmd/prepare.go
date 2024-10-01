@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/benleem/prattl/pysrc"
+	"github.com/prattlOrg/prattl/pysrc"
 	"github.com/spf13/cobra"
 )
 
