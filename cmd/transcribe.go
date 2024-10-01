@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/benleem/prattl/pysrc"
-	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
 )
 
@@ -34,16 +32,17 @@ var transcribeCmd = &cobra.Command{
 }
 
 func transcribe(fp string) (string, error) {
+	// s := spinner.New(spinner.CharSets[35], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+	// s.Prefix = "transcribing: "
+	// s.Suffix = "\n"
+	// s.Start()
+	// defer s.Stop()
+
 	fileBytes, err := os.ReadFile(fp)
-
-	s := spinner.New(spinner.CharSets[35], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
-	s.Prefix = "transcribing: "
-	s.Suffix = "\n"
-	s.Start()
-
 	if err != nil {
 		return "", err
 	}
+
 	program, err := pysrc.ReturnFile("transcribe.py")
 	if err != nil {
 		return "", err
@@ -74,7 +73,6 @@ func transcribe(fp string) (string, error) {
 	if err = cmd.Wait(); err != nil {
 		return "", fmt.Errorf("error waiting for command: " + err.Error())
 	}
-	s.Stop()
 	output := out.String()
 	return output, nil
 }
