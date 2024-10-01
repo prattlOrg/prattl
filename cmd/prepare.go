@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/benleem/prattl/pysrc"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +13,7 @@ func init() {
 
 var prepareCommand = &cobra.Command{
 	Use:   "prepare",
-	Short: "prepare the python distribution required by prattl",
+	Short: "Prepare the python distribution required by prattl",
 	Long:  "This command prepares the distribution needed to use prattl",
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {

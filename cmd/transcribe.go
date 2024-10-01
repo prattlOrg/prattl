@@ -28,6 +28,7 @@ var transcribeCmd = &cobra.Command{
 			return fmt.Errorf("%s", "no file path provided\n")
 		}
 
+		fmt.Println("transcribing...")
 		transcriptionMap := make(map[string]string)
 		transcriptions, err := transcribe(args)
 		if err != nil {
