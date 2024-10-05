@@ -73,6 +73,7 @@ func transcribe(fps []string) ([]string, error) {
 		}
 
 	}
+
 	program, err := pysrc.ReturnFile("transcribe.py")
 	if err != nil {
 		return returnStrings, err
