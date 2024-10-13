@@ -6,7 +6,7 @@ import (
 	"os"
 	"unicode"
 
-	"github.com/benleem/prattl/pysrc"
+	"github.com/prattlOrg/prattl/pysrc"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +23,7 @@ var cleanCommand = &cobra.Command{
 	Long:  "This command removes everything prattl adds to your filesystem",
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		env, err := pysrc.GetPrattlEnv()
+		env, err := pysrc.PrattlEnv()
 		if err != nil {
 			return fmt.Errorf("Error getting prattl env: %v\n", err)
 		}

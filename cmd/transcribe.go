@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/benleem/prattl/embed"
-	"github.com/benleem/prattl/pysrc"
+	"github.com/prattlOrg/prattl/embed"
+	"github.com/prattlOrg/prattl/pysrc"
 
 	"github.com/spf13/cobra"
 )

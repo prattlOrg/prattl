@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/voidKandy/go-pyenv/pyenv"
+	"github.com/prattlOrg/go-pyenv/pyenv"
 )
 
 //go:embed py
