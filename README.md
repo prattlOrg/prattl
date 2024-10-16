@@ -52,18 +52,34 @@ the output will be:
 
 <!-- > **_NOTE:_** CUDA architecture GPUs can take advantage of GPU acceleration for transcription -->
 
-## Prerequisites
+## Installation
+
+### Prerequisites
+
+[ffmpeg](https://www.ffmpeg.org/) installed and included in `$PATH`
+
+### Get Started
+
+1. [Download](https://github.com/prattlOrg/prattl/releases) (or [build](https://github.com/prattlOrg/prattl/tree/main?tab=readme-ov-file#build-locally)) binary to chosen location
+2. Include the path of the binary in `$PATH`
+3. Run `prattl prepare` to install necessary python dependencies to `$HOME/.prattl` directory
+4. Prattl is ready to be used!
+
+## Build Locally
+
+### Prerequisites
 
 [go](https://go.dev/) installed and included in `$PATH`
 
 [ffmpeg](https://www.ffmpeg.org/) installed and included in `$PATH`
 
-## Build Locally
+### Get Started
 
 1. Clone repository
 2. cd into the cloned repository
 3. Either run `go build` and then manually move the resulting binary into your `$PATH`, or just run `go install` to install the executable file to `$GOPATH/bin`
-4. You're good to go!
+4. Run `prattl prepare` to install necessary python dependencies to $HOME/.prattl directory
+5. You're good to go!
 
 ## Usage
 
