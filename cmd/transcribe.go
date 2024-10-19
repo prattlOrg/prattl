@@ -24,11 +24,7 @@ var transcribeCmd = &cobra.Command{
 	Long:  `This command transcribes the provided audiofile and prints the resulting string`,
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) == 0 {
-			return fmt.Errorf("%s", "no file path provided\n")
-		}
-
-		fmt.Println("transcribing...")
+		fmt.Println("Transcribing...")
 		transcriptionMap := make(map[string]string)
 		transcriptions, err := transcribe(args)
 		if err != nil {
@@ -64,7 +60,7 @@ func transcribe(fps []string) ([]string, error) {
 	for i, fp := range fps {
 		fileBytes, err := os.ReadFile(fp)
 		if err != nil {
-			return returnStrings, err
+			return returnStrings, fmt.Errorf("error reading file: %v", err)
 		}
 		allBytes = append(allBytes, fileBytes...)
 
@@ -78,31 +74,32 @@ func transcribe(fps []string) ([]string, error) {
 	if err != nil {
 		return returnStrings, err
 	}
-
 	env, err := pysrc.PrattlEnv()
 	if err != nil {
-		fmt.Printf("Error getting prattl env: %v\n", err)
-		os.Exit(1)
+		return returnStrings, err
 	}
-	cmd := env.ExecutePython("-c", program)
+	cmd, err := env.ExecutePython("-c", program)
+	if err != nil {
+		return returnStrings, err
+	}
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return returnStrings, fmt.Errorf("error instantiating pipe: " + err.Error())
+		return returnStrings, fmt.Errorf("error instantiating pipe: %v", err)
 	}
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	if err = cmd.Start(); err != nil {
-		return returnStrings, fmt.Errorf("error starting command: " + err.Error())
+		return returnStrings, fmt.Errorf("error starting command: %v", err)
 	}
 	_, err = stdin.Write(allBytes)
 	if err != nil {
-		return returnStrings, fmt.Errorf("error writing to stdin: " + stderr.String())
+		return returnStrings, fmt.Errorf("error writing to stdin: %v", err)
 	}
 	stdin.Close()
 	if err = cmd.Wait(); err != nil {
-		return returnStrings, fmt.Errorf("error waiting for command: " + stderr.String())
+		return returnStrings, fmt.Errorf("error waiting for command: %v", err)
 	}
 
 	output := out.String()
