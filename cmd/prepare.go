@@ -19,7 +19,7 @@ var prepareCommand = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		env, err := pysrc.PrattlEnv()
 		if err != nil {
-			return fmt.Errorf("Error getting prattl env: %v\n", err)
+			return err
 		}
 		// s := spinner.New(spinner.CharSets[35], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 		// s.Suffix = "\n"
@@ -27,13 +27,12 @@ var prepareCommand = &cobra.Command{
 		err = pysrc.PrepareDistribution(*env)
 		if err != nil {
 			if err.Error() == "dist exists" {
-				fmt.Println("prattl distribution already prepared")
-				return nil
+				return fmt.Errorf("prattl distribution already prepared")
 			}
-			return fmt.Errorf("Error preparing distribution env: %v\n", err)
+			return err
 		}
 		// s.Stop()
-		fmt.Println("successfully prepared prattl distribution")
+		fmt.Println("Successfully prepared prattl distribution")
 		return nil
 	},
 }

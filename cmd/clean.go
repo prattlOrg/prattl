@@ -25,7 +25,7 @@ var cleanCommand = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		env, err := pysrc.PrattlEnv()
 		if err != nil {
-			return fmt.Errorf("Error getting prattl env: %v\n", err)
+			return err
 		}
 
 		if Confirm {
@@ -44,7 +44,7 @@ var cleanCommand = &cobra.Command{
 
 			char, _, err := reader.ReadRune()
 			if err != nil {
-				return fmt.Errorf("Error reading from stdin: %v\n", err)
+				return fmt.Errorf("error reading from stdin: %v", err)
 			}
 			switch unicode.ToLower(char) {
 			case 'y':
@@ -64,7 +64,7 @@ var cleanCommand = &cobra.Command{
 		if proceed {
 			err = os.RemoveAll(env.ParentPath)
 			if err != nil {
-				return fmt.Errorf("Problem cleaning %s: %v", env.ParentPath, err)
+				return fmt.Errorf("problem cleaning %s: %v", env.ParentPath, err)
 			}
 			fmt.Println("Successfully cleaned prattl directory")
 			return nil

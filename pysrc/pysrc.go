@@ -17,7 +17,7 @@ var PythonSrc embed.FS
 func ReturnFile(fp string) (string, error) {
 	data, err := PythonSrc.ReadFile("py/" + fp)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error returning file: %v", fp)
 	}
 	return (string(data)), nil
 }
@@ -25,15 +25,16 @@ func ReturnFile(fp string) (string, error) {
 func PrattlEnv() (*pyenv.PyEnv, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting $HOME directory: %v", err)
 	}
 	parentPath := filepath.Join(home, ".prattl")
 	osArch := fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
-	env := pyenv.PyEnv{
-		ParentPath:   parentPath,
-		Distribution: osArch,
+	env, err := pyenv.NewPyEnv(parentPath)
+	if err != nil {
+		return nil, err
 	}
-	return &env, nil
+	env.Distribution = osArch
+	return env, nil
 }
 
 func PrepareDistribution(env pyenv.PyEnv) error {
@@ -41,11 +42,14 @@ func PrepareDistribution(env pyenv.PyEnv) error {
 	if !*exists {
 		// s.Prefix = "installing python distribution: "
 		// install needs to return error
-		env.Install()
-		// s.Prefix = "downloading dependencies:"
-		err := downloadDeps(env)
+		err := env.Install()
 		if err != nil {
-			return fmt.Errorf("error downloading prattl dependencies: %v\n", err)
+			return err
+		}
+		// s.Prefix = "downloading dependencies:"
+		err = downloadDeps(env)
+		if err != nil {
+			return err
 		}
 	} else {
 		return fmt.Errorf("dist exists")
@@ -71,7 +75,7 @@ func downloadDeps(env pyenv.PyEnv) error {
 	path := filepath.Join(env.ParentPath, requirementsFp)
 	err = os.WriteFile(path, []byte(reqs), 0o640)
 	if err != nil {
-		return err
+		return fmt.Errorf("error copying python requirements to %v: %v", path, err)
 	}
 	err = env.AddDependencies(path)
 	if err != nil {
