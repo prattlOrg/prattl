@@ -39,11 +39,7 @@ release:
   prerelease: auto
 
 brews:
-  - # IDs of the archives to use.
-    # Empty means all IDs.
-    # ids:
-    #   - other
-    commit_author:
+  - commit_author:
       name: Ben Marshall
       email: benmarshall.dev@gmail.com
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
@@ -69,12 +65,7 @@ brews:
           branch: main
 
 chocolateys:
-  - # IDs of the archives to use.
-    # Empty means all IDs.
-    # Attention: archives must not be in the 'binary' format.
-    # ids:
-    #   - windows
-    title: prattl
+  - title: prattl
     authors: Ben Marshall, Ezra Klitsie
     project_url: https://github.com/prattlOrg/prattl
     url_template: "https://github.com/prattlOrg/prattl/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
@@ -94,7 +85,7 @@ chocolateys:
     release_notes: "https://github.com/prattlOrg/prattl/releases/tag/{{ .Tag }}"
     dependencies:
       - id: ffmpeg
-    # api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
     source_repo: "https://push.chocolatey.org/"
     skip_publish: false
 
