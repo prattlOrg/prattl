@@ -6,34 +6,23 @@ before:
     # - go generate ./...
 
 builds:
-  - id: windows
-    binary: windows
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - windows
-    ignore:
-      - goos: windows
-        goarch: arm64
-  - id: other
-    binary: other
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - linux
+      - windows
       - darwin
     ignore:
       - goos: linux
         goarch: 386
+      - goos: windows
+        goarch: arm64
 
 universal_binaries:
   - replace: true
 
 archives:
-  - id: windows
-    builds:
-      - windows
-    format: zip
+  - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{  .ProjectName }}_{{ .Os }}_
@@ -41,17 +30,10 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}{{ .Arm }}{{ end }}
-  - id: other
-    builds:
-      - other
-    format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of `uname`.
-    name_template: >-
-      {{  .ProjectName }}_{{ .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
 
 release:
   prerelease: auto
@@ -59,8 +41,8 @@ release:
 brews:
   - # IDs of the archives to use.
     # Empty means all IDs.
-    ids:
-      - other
+    # ids:
+    #   - other
     commit_author:
       name: Ben Marshall
       email: benmarshall.dev@gmail.com
@@ -90,8 +72,8 @@ chocolateys:
   - # IDs of the archives to use.
     # Empty means all IDs.
     # Attention: archives must not be in the 'binary' format.
-    ids:
-      - windows
+    # ids:
+    #   - windows
     title: prattl
     authors: Ben Marshall, Ezra Klitsie
     project_url: https://github.com/prattlOrg/prattl
