@@ -6,18 +6,18 @@ import (
 	"os"
 	"unicode"
 
-	"github.com/prattlOrg/prattl/pysrc"
+	"github.com/prattlOrg/prattl/internal/pysrc"
 	"github.com/spf13/cobra"
 )
 
 var Confirm bool
 
 func init() {
-	cleanCommand.Flags().BoolVarP(&Confirm, "confirm", "y", false, "skips confirmation prompt")
-	rootCmd.AddCommand(cleanCommand)
+	cleanCmd.Flags().BoolVarP(&Confirm, "confirm", "y", false, "skips confirmation prompt")
+	rootCmd.AddCommand(cleanCmd)
 }
 
-var cleanCommand = &cobra.Command{
+var cleanCmd = &cobra.Command{
 	Use:   "clean",
 	Short: "Remove the python distribution built by prattl",
 	Long:  "This command removes everything prattl adds to your filesystem",
@@ -29,9 +29,9 @@ var cleanCommand = &cobra.Command{
 		}
 
 		if Confirm {
-			fmt.Printf("Removing %s\n", env.ParentPath)
+			fmt.Printf("Removing %s\n", env.EnvOptions.ParentPath)
 		} else {
-			fmt.Printf("Are you sure you want to delete %s? [Y/N]\n", env.ParentPath)
+			fmt.Printf("Are you sure you want to delete %s? [Y/N]\n", env.EnvOptions.ParentPath)
 		}
 		reader := bufio.NewReader(os.Stdin)
 
@@ -62,9 +62,9 @@ var cleanCommand = &cobra.Command{
 		}
 
 		if proceed {
-			err = os.RemoveAll(env.ParentPath)
+			err = os.RemoveAll(env.EnvOptions.ParentPath)
 			if err != nil {
-				return fmt.Errorf("problem cleaning %s: %v", env.ParentPath, err)
+				return fmt.Errorf("problem cleaning %s: %v", env.EnvOptions.ParentPath, err)
 			}
 			fmt.Println("Successfully cleaned prattl directory")
 			return nil

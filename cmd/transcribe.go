@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/prattlOrg/prattl/embed"
-	"github.com/prattlOrg/prattl/pysrc"
+	"github.com/prattlOrg/prattl/internal/embed"
+	"github.com/prattlOrg/prattl/internal/pysrc"
 
 	"github.com/spf13/cobra"
 )
@@ -21,10 +21,12 @@ func init() {
 var transcribeCmd = &cobra.Command{
 	Use:   "transcribe <filepath/to/audio.mp3>",
 	Short: "Transcribe the provided audio file (file path)",
-	Long:  `This command transcribes the provided audiofile and prints the resulting string`,
+	Long:  "This command transcribes the provided audiofile and prints the resulting string",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("Transcribing...")
+		_ = isPipeInput()
+		// fmt.Println(isPipe)
+		fmt.Printf("Transcribing...")
 		transcriptionMap := make(map[string]string)
 		transcriptions, err := transcribe(args)
 		if err != nil {
@@ -33,6 +35,7 @@ var transcribeCmd = &cobra.Command{
 
 		for i, trans := range transcriptions {
 			transcriptionMap[args[i]] = trans
+			// fmt.Printf("%v\n", trans)
 			// _, err := io.WriteString(os.Stdout, trans+"\n")
 			// if err != nil {
 			// 	return fmt.Errorf("error writing to stdout: %v", err)
@@ -44,6 +47,7 @@ var transcribeCmd = &cobra.Command{
 			return fmt.Errorf("error marshaling to JSON: %v", err)
 		}
 
+		clearLine()
 		_, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
 		if err != nil {
 			return fmt.Errorf("error writing to stdout: %v", err)
@@ -51,6 +55,11 @@ var transcribeCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+func isPipeInput() bool {
+	fileInfo, _ := os.Stdin.Stat()
+	return fileInfo.Mode()&os.ModeCharDevice == 0
 }
 
 func transcribe(fps []string) ([]string, error) {
@@ -103,6 +112,7 @@ func transcribe(fps []string) ([]string, error) {
 	}
 
 	output := out.String()
+	// fmt.Println(output)
 
 	returnStrings = strings.Split(strings.ToLower(output), embed.SeparatorExpectedString)
 
@@ -111,4 +121,13 @@ func transcribe(fps []string) ([]string, error) {
 	}
 
 	return returnStrings, nil
+}
+
+func clearLine() {
+	const clear = "\033[2K"
+	// clear line
+	fmt.Printf(clear)
+	// the line is cleared but the cursor is in the wrong place. the carriage
+	// return moves the cursor to the beginning of the line.
+	fmt.Printf("\r")
 }

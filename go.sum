@@ -3,8 +3,8 @@ github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/klauspost/compress v1.17.9 h1:6KIumPrER1LHsvBVuDa0r5xaG0Es51mhhB9BQB2qeMA=
 github.com/klauspost/compress v1.17.9/go.mod h1:Di0epgTjJY877eYKx5yC51cX2A2Vl2ibi7bDH9ttBbw=
-github.com/prattlOrg/go-pyenv v0.2.1 h1:Vfv70U9WVB/3mQp10NJYg90NEbBWWGvKtKK3MftCn5A=
-github.com/prattlOrg/go-pyenv v0.2.1/go.mod h1:BGstl/HJcbOaH6Q9zpD08CvHZJr8JUyYmahXLuaRsME=
+github.com/prattlOrg/go-pyenv v0.2.2 h1:Tk6bPMUyV8tyJZ/VUvCT3XNZr3wFrC/D0h4SPTXKF+M=
+github.com/prattlOrg/go-pyenv v0.2.2/go.mod h1:BGstl/HJcbOaH6Q9zpD08CvHZJr8JUyYmahXLuaRsME=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/spf13/cobra v1.8.0 h1:7aJaZx1B85qltLMc546zn58BxxfZdR/W22ej9CFoEf0=
 github.com/spf13/cobra v1.8.0/go.mod h1:WXLWApfZ71AjXPya3WOlMsY9yMs7YeiHhFVlvLyhcho=
