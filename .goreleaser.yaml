@@ -54,7 +54,7 @@ brews:
     repository:
       owner: prattlOrg
       name: prattl
-      branch: brew-releases/{{ .Version }}
+      branch: homebrew-prattl
       token: "{{ .Env.GITHUB_TOKEN }}"
       # pull_request:
       #   enabled: true
