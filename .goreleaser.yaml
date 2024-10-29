@@ -93,9 +93,7 @@ chocolateys:
     ids:
       - windows
     title: prattl
-    authors:
-      - Ben Marshall
-      - Ezra Klitsie
+    authors: Ben Marshall, Ezra Klitsie
     project_url: https://github.com/prattlOrg/prattl
     url_template: "https://github.com/prattlOrg/prattl/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     copyright: 2024 Prattl Org
