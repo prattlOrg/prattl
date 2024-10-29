@@ -53,8 +53,7 @@ brews:
       - name: ffmpeg
     repository:
       owner: prattlOrg
-      name: prattl
-      branch: homebrew-prattl
+      name: homebrew-prattl
       token: "{{ .Env.GITHUB_TOKEN }}"
       # pull_request:
       #   enabled: true
