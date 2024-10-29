@@ -52,17 +52,17 @@ brews:
     dependencies:
       - name: ffmpeg
     # Repository to push the generated files to.
-    repository:
-      owner: prattlOrg
-      name: prattl
-      branch: brew-releases/{{ .Version }}
-      token: "{{ .Env.GITHUB_TOKEN }}"
-      pull_request:
-        enabled: true
-        base:
-          owner: prattlOrg
-          name: prattl
-          branch: main
+    # repository:
+    #   owner: prattlOrg
+    #   name: prattl
+    #   branch: brew-releases/{{ .Version }}
+    #   token: "{{ .Env.GITHUB_TOKEN }}"
+    #   pull_request:
+    #     enabled: true
+    #     base:
+    #       owner: prattlOrg
+    #       name: prattl
+    #       branch: main
 
 chocolateys:
   - title: prattl
