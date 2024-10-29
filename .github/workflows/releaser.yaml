@@ -24,6 +24,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
+      - name: Verify Chocolatey installation
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: -h
       # More assembly might be required: Docker logins, GPG, etc.
       # It all depends on your needs.
       - name: Run GoReleaser
