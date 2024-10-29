@@ -27,7 +27,7 @@ builds:
         goarch: 386
 
 universal_binaries:
-  replace: true
+  - replace: true
 
 archives:
   - id: windows
