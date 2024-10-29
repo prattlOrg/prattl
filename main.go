@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/prattlOrg/prattl/cmd"
-	ffmpeg "github.com/prattlOrg/prattl/internal"
+	"github.com/prattlOrg/prattl/internal/ffmpeg"
 )
 
 func main() {

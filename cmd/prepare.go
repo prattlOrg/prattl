@@ -3,15 +3,15 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/prattlOrg/prattl/pysrc"
+	"github.com/prattlOrg/prattl/internal/pysrc"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	rootCmd.AddCommand(prepareCommand)
+	rootCmd.AddCommand(prepareCmd)
 }
 
-var prepareCommand = &cobra.Command{
+var prepareCmd = &cobra.Command{
 	Use:   "prepare",
 	Short: "Prepare the python distribution required by prattl",
 	Long:  "This command prepares the distribution needed to use prattl",
