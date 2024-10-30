@@ -8,8 +8,9 @@ on:
       - "*"
 
 permissions:
-  contents: write
-  deployments: write
+  read-all
+  write all
+  # contents: write
   # packages: write
   # issues: write
 
