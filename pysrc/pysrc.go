@@ -2,13 +2,14 @@ package pysrc
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	"github.com/voidKandy/go-pyenv/pyenv"
+	pyenv "github.com/prattlOrg/go-pyenv"
 )
 
 //go:embed py
@@ -22,22 +23,35 @@ func ReturnFile(fp string) (string, error) {
 	return (string(data)), nil
 }
 
-func PrattlEnv() (*pyenv.PyEnv, error) {
+type PrattlEnv struct {
+	pyenv      pyenv.PyEnv
+	compressed bool
+}
+
+func GetPrattlEnv() (*pyenv.PyEnv, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
 	}
 	parentPath := filepath.Join(home, ".prattl")
 	osArch := fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
-	env := pyenv.PyEnv{
-		ParentPath:   parentPath,
-		Distribution: osArch,
+	env, err := pyenv.NewPyEnv(parentPath, osArch)
+	if err != nil {
+		return nil, err
 	}
-	return &env, nil
+	_, err = os.Stat(pyenv.DistZipPath(&env.EnvOptions))
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return env, nil
+		}
+		return nil, err
+	}
+	env.EnvOptions.Compressed = true
+	return env, nil
 }
 
 func PrepareDistribution(env pyenv.PyEnv) error {
-	exists, _ := env.DistExists()
+	exists, _ := env.EnvOptions.DistExists()
 	if !*exists {
 		// s.Prefix = "installing python distribution: "
 		// install needs to return error
@@ -56,11 +70,11 @@ func PrepareDistribution(env pyenv.PyEnv) error {
 func downloadDeps(env pyenv.PyEnv) error {
 	var requirementsFp string
 	switch {
-	case strings.Contains(env.Distribution, "darwin"):
+	case strings.Contains(env.EnvOptions.Distribution, "darwin"):
 		requirementsFp = "requirements-darwin.txt"
-	case strings.Contains(env.Distribution, "linux"):
+	case strings.Contains(env.EnvOptions.Distribution, "linux"):
 		requirementsFp = "requirements-linux.txt"
-	case strings.Contains(env.Distribution, "windows"):
+	case strings.Contains(env.EnvOptions.Distribution, "windows"):
 		requirementsFp = "requirements-windows.txt"
 	}
 
@@ -68,7 +82,7 @@ func downloadDeps(env pyenv.PyEnv) error {
 	if err != nil {
 		return err
 	}
-	path := filepath.Join(env.ParentPath, requirementsFp)
+	path := filepath.Join(env.EnvOptions.ParentPath, requirementsFp)
 	err = os.WriteFile(path, []byte(reqs), 0o640)
 	if err != nil {
 		return err

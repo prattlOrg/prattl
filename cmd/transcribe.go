@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/benleem/prattl/embed"
-	"github.com/benleem/prattl/pysrc"
+	"github.com/prattlOrg/prattl/embed"
+	"github.com/prattlOrg/prattl/pysrc"
 
 	"github.com/spf13/cobra"
 )
@@ -79,12 +79,15 @@ func transcribe(fps []string) ([]string, error) {
 		return returnStrings, err
 	}
 
-	env, err := pysrc.PrattlEnv()
+	env, err := pysrc.GetPrattlEnv()
 	if err != nil {
 		fmt.Printf("Error getting prattl env: %v\n", err)
 		os.Exit(1)
 	}
-	cmd := env.ExecutePython("-c", program)
+	cmd, err := env.ExecutePython("-c", program)
+	if err != nil {
+		return returnStrings, err
+	}
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	stdin, err := cmd.StdinPipe()

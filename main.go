@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/benleem/prattl/cmd"
-	ffmpeg "github.com/benleem/prattl/internal"
+	"github.com/prattlOrg/prattl/cmd"
+	ffmpeg "github.com/prattlOrg/prattl/internal"
 )
 
 func main() {

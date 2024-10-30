@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/benleem/prattl/pysrc"
+	"github.com/prattlOrg/prattl/pysrc"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var prepareCommand = &cobra.Command{
 	Long:  "This command prepares the distribution needed to use prattl",
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		env, err := pysrc.PrattlEnv()
+		env, err := pysrc.GetPrattlEnv()
 		if err != nil {
 			return fmt.Errorf("Error getting prattl env: %v\n", err)
 		}
