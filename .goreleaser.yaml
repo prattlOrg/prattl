@@ -54,6 +54,7 @@ brews:
     repository:
       owner: prattlOrg
       name: homebrew-prattl
+      branch: main
       token: "{{ .Env.GITHUB_TOKEN }}"
       # pull_request:
       #   enabled: true
