@@ -8,7 +8,7 @@ on:
       - "*"
 
 permissions:
-  contents: write
+  contents: write-all
   # packages: write
   # issues: write
 
