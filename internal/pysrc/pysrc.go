@@ -2,6 +2,7 @@ package pysrc
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -22,7 +23,12 @@ func ReturnFile(fp string) (string, error) {
 	return (string(data)), nil
 }
 
-func PrattlEnv() (*pyenv.PyEnv, error) {
+type PrattlEnv struct {
+	pyenv      pyenv.PyEnv
+	compressed bool
+}
+
+func GetPrattlEnv() (*pyenv.PyEnv, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, fmt.Errorf("error getting $HOME directory: %v", err)
@@ -33,6 +39,14 @@ func PrattlEnv() (*pyenv.PyEnv, error) {
 	if err != nil {
 		return nil, err
 	}
+	_, err = os.Stat(pyenv.DistZipPath(&env.EnvOptions))
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return env, nil
+		}
+		return nil, err
+	}
+	env.EnvOptions.Compressed = true
 	return env, nil
 }
 

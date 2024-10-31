@@ -23,7 +23,7 @@ var cleanCmd = &cobra.Command{
 	Long:  "This command removes everything prattl adds to your filesystem",
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		env, err := pysrc.PrattlEnv()
+		env, err := pysrc.GetPrattlEnv()
 		if err != nil {
 			return err
 		}
@@ -64,7 +64,7 @@ var cleanCmd = &cobra.Command{
 		if proceed {
 			err = os.RemoveAll(env.EnvOptions.ParentPath)
 			if err != nil {
-				return fmt.Errorf("problem cleaning %s: %v", env.EnvOptions.ParentPath, err)
+				return fmt.Errorf("Problem cleaning %s: %v", env.EnvOptions.ParentPath, err)
 			}
 			fmt.Println("Successfully cleaned prattl directory")
 			return nil
