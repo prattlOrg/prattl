@@ -17,7 +17,7 @@ var prepareCmd = &cobra.Command{
 	Long:  "This command prepares the distribution needed to use prattl",
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		env, err := pysrc.PrattlEnv()
+		env, err := pysrc.GetPrattlEnv()
 		if err != nil {
 			return err
 		}

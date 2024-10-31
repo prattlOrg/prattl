@@ -83,7 +83,8 @@ func transcribe(fps []string) ([]string, error) {
 	if err != nil {
 		return returnStrings, err
 	}
-	env, err := pysrc.PrattlEnv()
+
+	env, err := pysrc.GetPrattlEnv()
 	if err != nil {
 		return returnStrings, err
 	}
