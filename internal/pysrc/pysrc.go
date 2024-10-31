@@ -40,7 +40,6 @@ func PrepareDistribution(env pyenv.PyEnv) error {
 	exists, _ := env.EnvOptions.DistExists()
 	if !*exists {
 		// s.Prefix = "installing python distribution: "
-		// install needs to return error
 		err := env.Install()
 		if err != nil {
 			return err
