@@ -27,8 +27,8 @@ var transcribeCmd = &cobra.Command{
 		if len(args) == 0 {
 			return fmt.Errorf("%s", "no file path provided\n")
 		}
+		fmt.Fprintln(os.Stderr, "Transcribing..")
 
-		fmt.Println("transcribing...")
 		transcriptionMap := make(map[string]string)
 		transcriptions, err := transcribe(args)
 		if err != nil {
@@ -37,10 +37,6 @@ var transcribeCmd = &cobra.Command{
 
 		for i, trans := range transcriptions {
 			transcriptionMap[args[i]] = trans
-			// _, err := io.WriteString(os.Stdout, trans+"\n")
-			// if err != nil {
-			// 	return fmt.Errorf("error writing to stdout: %v", err)
-			// }
 		}
 
 		jsonOutput, err := json.Marshal(transcriptionMap)
