@@ -24,9 +24,13 @@ var transcribeCmd = &cobra.Command{
 	Long:  "This command transcribes the provided audiofile and prints the resulting string",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		_ = isPipeInput()
-		// fmt.Println(isPipe)
-		fmt.Printf("Transcribing...")
+
+		if len(args) == 0 {
+			return fmt.Errorf("%s", "no file path provided\n")
+		}
+		fmt.Fprintln(os.Stderr, "Transcribing..")
+
+
 		transcriptionMap := make(map[string]string)
 		transcriptions, err := transcribe(args)
 		if err != nil {
@@ -35,11 +39,7 @@ var transcribeCmd = &cobra.Command{
 
 		for i, trans := range transcriptions {
 			transcriptionMap[args[i]] = trans
-			// fmt.Printf("%v\n", trans)
-			// _, err := io.WriteString(os.Stdout, trans+"\n")
-			// if err != nil {
-			// 	return fmt.Errorf("error writing to stdout: %v", err)
-			// }
+
 		}
 
 		jsonOutput, err := json.Marshal(transcriptionMap)
