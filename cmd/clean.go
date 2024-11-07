@@ -6,18 +6,18 @@ import (
 	"os"
 	"unicode"
 
-	"github.com/prattlOrg/prattl/pysrc"
+	"github.com/prattlOrg/prattl/internal/pysrc"
 	"github.com/spf13/cobra"
 )
 
 var Confirm bool
 
 func init() {
-	cleanCommand.Flags().BoolVarP(&Confirm, "confirm", "y", false, "skips confirmation prompt")
-	rootCmd.AddCommand(cleanCommand)
+	cleanCmd.Flags().BoolVarP(&Confirm, "confirm", "y", false, "skips confirmation prompt")
+	rootCmd.AddCommand(cleanCmd)
 }
 
-var cleanCommand = &cobra.Command{
+var cleanCmd = &cobra.Command{
 	Use:   "clean",
 	Short: "Remove the python distribution built by prattl",
 	Long:  "This command removes everything prattl adds to your filesystem",
@@ -25,7 +25,7 @@ var cleanCommand = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		env, err := pysrc.GetPrattlEnv()
 		if err != nil {
-			return fmt.Errorf("Error getting prattl env: %v\n", err)
+			return err
 		}
 
 		if Confirm {
@@ -44,7 +44,7 @@ var cleanCommand = &cobra.Command{
 
 			char, _, err := reader.ReadRune()
 			if err != nil {
-				return fmt.Errorf("Error reading from stdin: %v\n", err)
+				return fmt.Errorf("error reading from stdin: %v", err)
 			}
 			switch unicode.ToLower(char) {
 			case 'y':

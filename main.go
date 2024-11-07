@@ -1,18 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/prattlOrg/prattl/cmd"
-	ffmpeg "github.com/prattlOrg/prattl/internal"
+	"github.com/prattlOrg/prattl/internal/ffmpeg"
 )
 
 func main() {
 	err := ffmpeg.CheckInstall()
 	if err != nil {
-		fmt.Printf("error creating prattl env: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("error creating prattl env: %v\n", err)
 	}
 	cmd.Execute()
 }

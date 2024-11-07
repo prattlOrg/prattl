@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/prattlOrg/prattl/embed"
-	"github.com/prattlOrg/prattl/pysrc"
+	"github.com/prattlOrg/prattl/internal/embed"
+	"github.com/prattlOrg/prattl/internal/pysrc"
 
 	"github.com/spf13/cobra"
 )
@@ -21,13 +21,15 @@ func init() {
 var transcribeCmd = &cobra.Command{
 	Use:   "transcribe <filepath/to/audio.mp3>",
 	Short: "Transcribe the provided audio file (file path)",
-	Long:  `This command transcribes the provided audiofile and prints the resulting string`,
+	Long:  "This command transcribes the provided audiofile and prints the resulting string",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+
 		if len(args) == 0 {
 			return fmt.Errorf("%s", "no file path provided\n")
 		}
 		fmt.Fprintln(os.Stderr, "Transcribing..")
+
 
 		transcriptionMap := make(map[string]string)
 		transcriptions, err := transcribe(args)
@@ -37,6 +39,7 @@ var transcribeCmd = &cobra.Command{
 
 		for i, trans := range transcriptions {
 			transcriptionMap[args[i]] = trans
+
 		}
 
 		jsonOutput, err := json.Marshal(transcriptionMap)
@@ -44,6 +47,7 @@ var transcribeCmd = &cobra.Command{
 			return fmt.Errorf("error marshaling to JSON: %v", err)
 		}
 
+		clearLine()
 		_, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
 		if err != nil {
 			return fmt.Errorf("error writing to stdout: %v", err)
@@ -53,6 +57,11 @@ var transcribeCmd = &cobra.Command{
 	},
 }
 
+func isPipeInput() bool {
+	fileInfo, _ := os.Stdin.Stat()
+	return fileInfo.Mode()&os.ModeCharDevice == 0
+}
+
 func transcribe(fps []string) ([]string, error) {
 	returnStrings := []string{}
 
@@ -60,7 +69,7 @@ func transcribe(fps []string) ([]string, error) {
 	for i, fp := range fps {
 		fileBytes, err := os.ReadFile(fp)
 		if err != nil {
-			return returnStrings, err
+			return returnStrings, fmt.Errorf("error reading file: %v", err)
 		}
 		allBytes = append(allBytes, fileBytes...)
 
@@ -77,8 +86,7 @@ func transcribe(fps []string) ([]string, error) {
 
 	env, err := pysrc.GetPrattlEnv()
 	if err != nil {
-		fmt.Printf("Error getting prattl env: %v\n", err)
-		os.Exit(1)
+		return returnStrings, err
 	}
 	cmd, err := env.ExecutePython("-c", program)
 	if err != nil {
@@ -88,23 +96,24 @@ func transcribe(fps []string) ([]string, error) {
 	var stderr bytes.Buffer
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return returnStrings, fmt.Errorf("error instantiating pipe: " + err.Error())
+		return returnStrings, fmt.Errorf("error instantiating pipe: %v", err)
 	}
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	if err = cmd.Start(); err != nil {
-		return returnStrings, fmt.Errorf("error starting command: " + err.Error())
+		return returnStrings, fmt.Errorf("error starting command: %v", err)
 	}
 	_, err = stdin.Write(allBytes)
 	if err != nil {
-		return returnStrings, fmt.Errorf("error writing to stdin: " + stderr.String())
+		return returnStrings, fmt.Errorf("error writing to stdin: %v", err)
 	}
 	stdin.Close()
 	if err = cmd.Wait(); err != nil {
-		return returnStrings, fmt.Errorf("error waiting for command: " + stderr.String())
+		return returnStrings, fmt.Errorf("error waiting for command: %v", err)
 	}
 
 	output := out.String()
+	// fmt.Println(output)
 
 	returnStrings = strings.Split(strings.ToLower(output), embed.SeparatorExpectedString)
 
@@ -113,4 +122,13 @@ func transcribe(fps []string) ([]string, error) {
 	}
 
 	return returnStrings, nil
+}
+
+func clearLine() {
+	const clear = "\033[2K"
+	// clear line
+	fmt.Printf(clear)
+	// the line is cleared but the cursor is in the wrong place. the carriage
+	// return moves the cursor to the beginning of the line.
+	fmt.Printf("\r")
 }

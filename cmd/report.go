@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/prattlOrg/go-pyenv"
-	"github.com/prattlOrg/prattl/pysrc"
+	"github.com/prattlOrg/prattl/internal/pysrc"
 	"github.com/spf13/cobra"
 )
 

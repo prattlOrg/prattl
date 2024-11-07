@@ -1,11 +1,3 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-
-# The lines below are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/need to use them.
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-# vim: set ts=2 sw=2 tw=0 fo=cnqoj
-
 version: 2
 
 before:
@@ -26,20 +18,75 @@ builds:
       - goos: windows
         goarch: arm64
 
+universal_binaries:
+  - replace: true
+
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
+      {{  .ProjectName }}_{{ .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
+      {{- if .Arm }}{{ .Arm }}{{ end }}
     # use zip for windows archives
     format_overrides:
       - goos: windows
         format: zip
+
+release:
+  prerelease: auto
+
+brews:
+  - commit_author:
+      name: Ben Marshall
+      email: benmarshall.dev@gmail.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    directory: Formula
+    url_template: "https://github.com/prattlOrg/prattl/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    homepage: "https://prattl.co/"
+    description: "CLI tool for transcribing audio to text."
+    license: "MIT"
+    skip_upload: auto
+    dependencies:
+      - name: ffmpeg
+    repository:
+      owner: prattlOrg
+      name: homebrew-prattl
+      branch: main
+      token: "{{ .Env.GITHUB_TOKEN }}"
+      # pull_request:
+      #   enabled: true
+      #   base:
+      #     owner: prattlOrg
+      #     name: prattl
+      #     branch: main
+
+chocolateys:
+  - title: prattl
+    authors: Ben Marshall, Ezra Klitsie
+    project_url: https://github.com/prattlOrg/prattl
+    url_template: "https://github.com/prattlOrg/prattl/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    copyright: 2024 Prattl Org
+    package_source_url: https://github.com/prattlOrg/prattl
+    icon_url: "https://github.com/prattlOrg/prattl/blob/main/assets/logo.png"
+    license_url: https://github.com/prattlOrg/prattl/blob/main/LICENSE
+    require_license_acceptance: false
+    project_source_url: https://github.com/prattlOrg/prattl
+    docs_url: https://github.com/prattlOrg/prattl/blob/main/README.md
+    bug_tracker_url: https://github.com/prattlOrg/prattl/issues
+    tags: "transcription ai"
+    summary: CLI tool for transcribing audio to text.
+    description: |
+      {{ .ProjectName }} installer package.
+      CLI tool for transcribing audio to text.
+    release_notes: "https://github.com/prattlOrg/prattl/releases/tag/{{ .Tag }}"
+    dependencies:
+      - id: ffmpeg
+    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+    source_repo: "https://push.chocolatey.org/"
+    skip_publish: false
 
 changelog:
   sort: asc
