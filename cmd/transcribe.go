@@ -1,10 +1,9 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
@@ -22,44 +21,83 @@ var transcribeCmd = &cobra.Command{
 	Use:   "transcribe <filepath/to/audio.mp3>",
 	Short: "Transcribe the provided audio file (file path)",
 	Long:  "This command transcribes the provided audiofile and prints the resulting string",
-	Args:  cobra.MinimumNArgs(1),
+	// Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		_ = isPipeInput()
-		// fmt.Println(isPipe)
-		fmt.Printf("Transcribing...")
-		transcriptionMap := make(map[string]string)
-		transcriptions, err := transcribe(args)
+		isStdin, err := checkStdin()
 		if err != nil {
 			return err
 		}
-
-		for i, trans := range transcriptions {
-			transcriptionMap[args[i]] = trans
-			// fmt.Printf("%v\n", trans)
-			// _, err := io.WriteString(os.Stdout, trans+"\n")
-			// if err != nil {
-			// 	return fmt.Errorf("error writing to stdout: %v", err)
-			// }
+		if isStdin {
+			fileBytes, err := readStdin()
+			if err != nil {
+				return err
+			}
+			fmt.Println(fileBytes)
+			fmt.Println(string(fileBytes))
+		} else {
+			if len(args) == 0 {
+				return fmt.Errorf("requires at least 1 arg(s), only received 0")
+			}
+			fmt.Println("using filepath")
 		}
-
-		jsonOutput, err := json.Marshal(transcriptionMap)
-		if err != nil {
-			return fmt.Errorf("error marshaling to JSON: %v", err)
-		}
-
-		clearLine()
-		_, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
-		if err != nil {
-			return fmt.Errorf("error writing to stdout: %v", err)
-		}
-
 		return nil
+		// fmt.Printf("Transcribing...")
+		// transcriptionMap := make(map[string]string)
+		// transcriptions, err := transcribe(args)
+		// if err != nil {
+		// 	return err
+		// }
+
+		// for i, trans := range transcriptions {
+		// 	transcriptionMap[args[i]] = trans
+		// 	// fmt.Printf("%v\n", trans)
+		// 	// _, err := io.WriteString(os.Stdout, trans+"\n")
+		// 	// if err != nil {
+		// 	// 	return fmt.Errorf("error writing to stdout: %v", err)
+		// 	// }
+		// }
+
+		// jsonOutput, err := json.Marshal(transcriptionMap)
+		// if err != nil {
+		// 	return fmt.Errorf("error marshaling to JSON: %v", err)
+		// }
+
+		// clearLine()
+		// _, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
+		// if err != nil {
+		// 	return fmt.Errorf("error writing to stdout: %v", err)
+		// }
+
+		// return nil
 	},
 }
 
-func isPipeInput() bool {
-	fileInfo, _ := os.Stdin.Stat()
-	return fileInfo.Mode()&os.ModeCharDevice == 0
+func checkStdin() (bool, error) {
+	fileStat, err := os.Stdin.Stat()
+	if err != nil {
+		return false, fmt.Errorf("getting stdin stat failed: %v", err)
+	}
+	// check if stdin is pipe
+	if fileStat.Mode()&os.ModeNamedPipe == 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
+func readStdin() ([]byte, error) {
+	scanner := bufio.NewScanner(os.Stdin)
+	scannerBytes := make([]byte, 0)
+	for scanner.Scan() {
+		if len(scanner.Bytes()) == 0 {
+			return nil, fmt.Errorf("stdin is empty")
+		}
+		scannerBytes = append(scannerBytes, scanner.Bytes()...)
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("reading from stdin failed: %v", err)
+	}
+	return scannerBytes, nil
 }
 
 func transcribe(fps []string) ([]string, error) {
