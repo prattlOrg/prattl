@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(reportCommand)
+	RootCmd.AddCommand(reportCommand)
 }
 
 // ripped straight from stack overflow: https://stackoverflow.com/questions/32482673/how-to-get-directory-total-size

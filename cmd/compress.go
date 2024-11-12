@@ -8,8 +8,8 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(compressCommand)
-	rootCmd.AddCommand(decompressCommand)
+	RootCmd.AddCommand(compressCommand)
+	RootCmd.AddCommand(decompressCommand)
 }
 
 var compressCommand = &cobra.Command{
