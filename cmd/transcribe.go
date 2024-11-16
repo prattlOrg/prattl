@@ -48,19 +48,22 @@ var transcribeCmd = &cobra.Command{
 				return err
 			}
 		}
-
 		return nil
 	},
 }
 
 func checkStdin() (bool, error) {
-	// fileStat, err := os.Stdin.Stat()
-	// if err != nil {
-	// 	return false, fmt.Errorf("getting stdin stat failed: %v", err)
-	// }
+	fileStat, err := os.Stdin.Stat()
+	if err != nil {
+		return false, fmt.Errorf("getting stdin stat failed: %v", err)
+	}
+	if fileStat.Size() == 0 {
+		return false, nil
+	}
+	return true, nil
+
 	// // check if stdin is pipe
 	// return fileStat.Mode()&os.ModeNamedPipe != 0, nil
-	return true, nil
 }
 
 func readStdin() ([]byte, error) {
@@ -82,18 +85,15 @@ func readStdin() ([]byte, error) {
 }
 
 func transcribeStdin(fileBytes []byte) error {
-	fmt.Fprintln(os.Stderr, "Transcribing..")
 	transcription, err := transcribe(fileBytes)
 	if err != nil {
 		return err
 	}
-	clearLine()
 	fmt.Println(transcription[0])
 	return nil
 }
 
 func transcribeFp(fps ...string) error {
-	fmt.Fprintln(os.Stderr, "Transcribing..")
 	var allBytes []byte
 	for i, fp := range fps {
 		fileBytes, err := os.ReadFile(fp)
@@ -119,7 +119,6 @@ func transcribeFp(fps ...string) error {
 	if err != nil {
 		return fmt.Errorf("marshaling to JSON failed: %v", err)
 	}
-	clearLine()
 	_, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
 	if err != nil {
 		return fmt.Errorf("writing to stdout failed: %v", err)
@@ -128,7 +127,7 @@ func transcribeFp(fps ...string) error {
 }
 
 func transcribe(file []byte) ([]string, error) {
-	fmt.Println(file)
+	fmt.Fprintln(os.Stderr, "Transcribing..")
 	program, err := pysrc.ReturnFile("transcribe.py")
 	if err != nil {
 		return nil, err
@@ -170,6 +169,9 @@ func transcribe(file []byte) ([]string, error) {
 	for _, str := range returnStrings {
 		str = fmt.Sprintf("---%s---\n", str)
 	}
+
+	// not working frfr
+	clearLine()
 
 	return returnStrings, nil
 }

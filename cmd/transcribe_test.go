@@ -1,7 +1,6 @@
 package cmd_test
 
 import (
-	"bytes"
 	"os"
 	"path/filepath"
 	"testing"
@@ -17,15 +16,32 @@ func TestStdin(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// t.Log(dat)
+
+	tmpfile, err := os.CreateTemp("../test_audio", "*.mp3")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(tmpfile.Name()) // clean up
+	if _, err := tmpfile.Write(dat); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tmpfile.Seek(0, 0); err != nil {
+		t.Fatal(err)
+	}
+	oldStdin := os.Stdin
+	defer func() { os.Stdin = oldStdin }() // Restore original Stdin
+	os.Stdin = tmpfile
 
 	root := cmd.RootCmd
-	in := bytes.NewBuffer(dat)
-	root.SetIn(in)
+	root.SetIn(nil)
 	root.SetArgs([]string{"transcribe"})
 	err = root.Execute()
 	if err != nil {
 		t.FailNow()
+	}
+
+	if err := tmpfile.Close(); err != nil {
+		t.Fatal(err)
 	}
 }
 
