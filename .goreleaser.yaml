@@ -17,6 +17,14 @@ builds:
         goarch: 386
       - goos: windows
         goarch: arm64
+    ldflags:
+      - -s -w -X cmd.version={{.Version}} -X cmd.commit={{.Commit}} -X cmd.date={{.Date}} -X cmd.builtBy=goreleaser
+
+# binary_signs:
+#   - {}
+
+# signs:
+#   - artifacts: checksum
 
 universal_binaries:
   - replace: true
@@ -66,7 +74,7 @@ brews:
 chocolateys:
   - title: prattl
     authors: Ben Marshall, Ezra Klitsie
-    project_url: https://github.com/prattlOrg/prattl
+    project_url: https://prattl.co/
     url_template: "https://github.com/prattlOrg/prattl/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     copyright: 2024 Prattl Org
     package_source_url: https://github.com/prattlOrg/prattl
@@ -88,8 +96,42 @@ chocolateys:
     source_repo: "https://push.chocolatey.org/"
     skip_publish: false
 
+nfpms:
+  - package_name: prattl
+    file_name_template: >-
+      {{  .ProjectName }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}{{ .Arm }}{{ end }}
+    vendor: Prattl Org.
+    homepage: https://prattl.co/
+    maintainer: Benjamin Marshall <benmarshall.dev@gmail.com>
+    description: |-
+      Prattl installer package.
+      CLI tool for transcribing audio to text.
+    license: MIT
+    formats:
+      - apk
+      - deb
+      - rpm
+      - termux.deb
+      - archlinux
+    dependencies:
+      - ffmpeg
+    # Changelog YAML file, see: https://github.com/goreleaser/chglog
+    #
+    # You can use goreleaser/chglog to create the changelog for your project,
+    # pass that changelog yaml file to GoReleaser,
+    # and it should in turn setup it accordingly for the given available
+    # formats (deb and rpm at the moment).
+    #
+    # Experimental.
+    # changelog: changelog.yaml
+
 changelog:
   sort: asc
+  use: github
   filters:
     exclude:
       - "^docs:"

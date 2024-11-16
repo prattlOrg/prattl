@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(prepareCmd)
+	RootCmd.AddCommand(prepareCmd)
 }
 
 var prepareCmd = &cobra.Command{

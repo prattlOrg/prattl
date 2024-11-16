@@ -14,7 +14,7 @@ var Confirm bool
 
 func init() {
 	cleanCmd.Flags().BoolVarP(&Confirm, "confirm", "y", false, "skips confirmation prompt")
-	rootCmd.AddCommand(cleanCmd)
+	RootCmd.AddCommand(cleanCmd)
 }
 
 var cleanCmd = &cobra.Command{

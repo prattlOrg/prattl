@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -15,61 +17,88 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(transcribeCmd)
+	RootCmd.AddCommand(transcribeCmd)
 }
 
 var transcribeCmd = &cobra.Command{
 	Use:   "transcribe <filepath/to/audio.mp3>",
 	Short: "Transcribe the provided audio file (file path)",
 	Long:  "This command transcribes the provided audiofile and prints the resulting string",
-	Args:  cobra.MinimumNArgs(1),
+	// Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		if len(args) == 0 {
-			return fmt.Errorf("%s", "no file path provided\n")
-		}
-		fmt.Fprintln(os.Stderr, "Transcribing..")
-
-
-		transcriptionMap := make(map[string]string)
-		transcriptions, err := transcribe(args)
+		isStdin, err := checkStdin()
 		if err != nil {
 			return err
 		}
-
-		for i, trans := range transcriptions {
-			transcriptionMap[args[i]] = trans
-
+		if isStdin {
+			fileBytes, err := readStdin()
+			if err != nil {
+				return err
+			}
+			err = transcribeStdin(fileBytes)
+			if err != nil {
+				return err
+			}
+		} else {
+			if len(args) == 0 {
+				return fmt.Errorf("requires at least 1 arg(s), only received 0")
+			}
+			err = transcribeFp(args...)
+			if err != nil {
+				return err
+			}
 		}
-
-		jsonOutput, err := json.Marshal(transcriptionMap)
-		if err != nil {
-			return fmt.Errorf("error marshaling to JSON: %v", err)
-		}
-
-		clearLine()
-		_, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
-		if err != nil {
-			return fmt.Errorf("error writing to stdout: %v", err)
-		}
-
 		return nil
 	},
 }
 
-func isPipeInput() bool {
-	fileInfo, _ := os.Stdin.Stat()
-	return fileInfo.Mode()&os.ModeCharDevice == 0
+func checkStdin() (bool, error) {
+	fileStat, err := os.Stdin.Stat()
+	if err != nil {
+		return false, fmt.Errorf("getting stdin stat failed: %v", err)
+	}
+	if fileStat.Size() == 0 {
+		return false, nil
+	}
+	return true, nil
+
+	// // check if stdin is pipe
+	// return fileStat.Mode()&os.ModeNamedPipe != 0, nil
 }
 
-func transcribe(fps []string) ([]string, error) {
-	returnStrings := []string{}
+func readStdin() ([]byte, error) {
+	reader := bufio.NewReader(os.Stdin)
+	var fileBytes []byte
+	for {
+		b, err := reader.ReadByte()
+		if err != nil && !errors.Is(err, io.EOF) {
+			return nil, fmt.Errorf("failed to read file byte: %v", err)
+		}
+		// process the one byte b
+		if err != nil {
+			// end of file
+			break
+		}
+		fileBytes = append(fileBytes, b)
+	}
+	return fileBytes, nil
+}
 
+func transcribeStdin(fileBytes []byte) error {
+	transcription, err := transcribe(fileBytes)
+	if err != nil {
+		return err
+	}
+	fmt.Println(transcription[0])
+	return nil
+}
+
+func transcribeFp(fps ...string) error {
 	var allBytes []byte
 	for i, fp := range fps {
 		fileBytes, err := os.ReadFile(fp)
 		if err != nil {
-			return returnStrings, fmt.Errorf("error reading file: %v", err)
+			return fmt.Errorf("error reading file: %v", err)
 		}
 		allBytes = append(allBytes, fileBytes...)
 
@@ -78,48 +107,71 @@ func transcribe(fps []string) ([]string, error) {
 		}
 
 	}
+	transcriptionMap := make(map[string]string)
+	transcriptions, err := transcribe(allBytes)
+	if err != nil {
+		return err
+	}
+	for i, trans := range transcriptions {
+		transcriptionMap[fps[i]] = trans
+	}
+	jsonOutput, err := json.Marshal(transcriptionMap)
+	if err != nil {
+		return fmt.Errorf("marshaling to JSON failed: %v", err)
+	}
+	_, err = io.WriteString(os.Stdout, string(jsonOutput)+"\n")
+	if err != nil {
+		return fmt.Errorf("writing to stdout failed: %v", err)
+	}
+	return nil
+}
 
+func transcribe(file []byte) ([]string, error) {
+	fmt.Fprintln(os.Stderr, "Transcribing..")
 	program, err := pysrc.ReturnFile("transcribe.py")
 	if err != nil {
-		return returnStrings, err
+		return nil, err
 	}
 
 	env, err := pysrc.GetPrattlEnv()
 	if err != nil {
-		return returnStrings, err
+		return nil, err
 	}
+
 	cmd, err := env.ExecutePython("-c", program)
 	if err != nil {
-		return returnStrings, err
+		return nil, err
 	}
+
 	var out bytes.Buffer
 	var stderr bytes.Buffer
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return returnStrings, fmt.Errorf("error instantiating pipe: %v", err)
-	}
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
-	if err = cmd.Start(); err != nil {
-		return returnStrings, fmt.Errorf("error starting command: %v", err)
-	}
-	_, err = stdin.Write(allBytes)
+	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return returnStrings, fmt.Errorf("error writing to stdin: %v", err)
+		return nil, fmt.Errorf("error instantiating pipe: %v", stderr.String())
+	}
+	if err = cmd.Start(); err != nil {
+		return nil, fmt.Errorf("error starting command: %v", stderr.String())
+	}
+	_, err = stdin.Write(file)
+	if err != nil {
+		return nil, fmt.Errorf("error writing to stdin: %v", stderr.String())
 	}
 	stdin.Close()
 	if err = cmd.Wait(); err != nil {
-		return returnStrings, fmt.Errorf("error waiting for command: %v", err)
+		return nil, fmt.Errorf("error waiting for command: %v", stderr.String())
 	}
 
 	output := out.String()
-	// fmt.Println(output)
-
-	returnStrings = strings.Split(strings.ToLower(output), embed.SeparatorExpectedString)
+	returnStrings := strings.Split(strings.ToLower(output), embed.SeparatorExpectedString)
 
 	for _, str := range returnStrings {
 		str = fmt.Sprintf("---%s---\n", str)
 	}
+
+	// not working frfr
+	clearLine()
 
 	return returnStrings, nil
 }
